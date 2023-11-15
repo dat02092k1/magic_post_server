@@ -2,10 +2,17 @@ const mongoose = require('mongoose');
 const UtilConstant = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
-    username: {
+    name: {
         type: String,
         required: true,
     },
+    departmentId: {
+        type: String,
+    },
+    email: {
+        type: String,
+        required: true,
+    },     
     password: {
         type: String,
         required: true,
@@ -13,8 +20,12 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: UtilConstant.roleUsers,
-        default: UtilConstant.roleUsers[0],
+        required: true    
     }, 
+    avatarUrl: {
+        type: String,
+        default: '',
+    }
 });
 
 module.exports = mongoose.model('User', userSchema);
