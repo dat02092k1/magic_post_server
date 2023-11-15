@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     departmentId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department'
     },
     email: {
         type: String,
