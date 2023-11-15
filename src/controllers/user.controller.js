@@ -10,6 +10,12 @@ class UserController {
     getDetail = asyncHandler(async (req, res, next) => {
         OK(res, 'get detail success', await UserService.getDetail(req.params.id))
     })
+
+    editDetails = asyncHandler(async (req, res, next) => {
+        OK(res, 'edit detail success', await UserService.edit(req.params.id, req.body))
+    })
+
+    
 }
 
 module.exports = new UserController();

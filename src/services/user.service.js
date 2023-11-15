@@ -31,6 +31,10 @@ class UserService {
             user: UtilFunc.getInfoData({fields: ['_id', 'username'], object: holderUser}),
         }
     }
+
+    static edit = async (id, user) => {
+        
+    }
 }
 
 module.exports = UserService;
