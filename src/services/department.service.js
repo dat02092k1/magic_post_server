@@ -17,7 +17,7 @@ class DepartmentService {
   };
 
   static create = async (gatherPoint) => {
-    const checkPoint = await Department.findOne({ name: name });
+    const checkPoint = await Department.findOne({ name: gatherPoint.name }).lean();
 
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
@@ -41,7 +41,7 @@ class DepartmentService {
   };
 
   static edit = async (id, gatherPoint) => {
-    const checkPoint = await Department.findById(id).lean();
+    let checkPoint = await Department.findById(id).lean();
 
     if (!checkPoint) throw new Api404Error("gather point not found");
 
