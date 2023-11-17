@@ -41,7 +41,7 @@ class DepartmentService {
   };
 
   static edit = async (id, gatherPoint) => {
-    let checkPoint = await Department.findById(id).lean();
+    let checkPoint = await Department.findById(id);
 
     if (!checkPoint) throw new Api404Error("gather point not found");
 
