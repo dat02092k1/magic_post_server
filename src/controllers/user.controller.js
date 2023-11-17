@@ -11,11 +11,13 @@ class UserController {
         OK(res, 'get detail success', await UserService.getDetail(req.params.id))
     })
 
-    editDetails = asyncHandler(async (req, res, next) => {
+    editDetail = asyncHandler(async (req, res, next) => {
         OK(res, 'edit detail success', await UserService.edit(req.params.id, req.body))
     })
 
-    
+    delete = asyncHandler(async (req, res, next) => {
+        OK(res, 'delete user success', await UserService.delete(req.params.id))
+    })
 }
 
 module.exports = new UserController();

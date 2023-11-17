@@ -33,6 +33,23 @@ class UserService {
     }
 
     static edit = async (id, user) => {
+        const userData = await User.findById(id);
+        if (!userData) throw new Api404Error('user not found');
+
+        userData = user;
+        
+        await userData.save();
+        console.log("edit success");
+    }
+
+    static delete = async (id) => {
+        User.findByIdAndDelete(id, (e, deleted) => {
+            if(e){
+                console.log("ERROR: " + e);
+            } else {
+                console.log("deleted " + deleted);
+            }
+        })
         
     }
 }
