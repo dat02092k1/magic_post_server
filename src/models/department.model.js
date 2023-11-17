@@ -39,8 +39,12 @@ const departmentSchema = new mongoose.Schema({
         required: true,
     },
     linkDepartments: [{
-        type: String,        
-        id: String
+        id: {
+            type: String,
+        },
+        type: {
+            type: String,
+        },
     }], 
 });
 

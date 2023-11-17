@@ -45,7 +45,7 @@ class DepartmentService {
 
     if (!checkPoint) throw new Api404Error("gather point not found");
 
-    if (gatherPoint.type !== checkPoint.type) {
+    if (checkPoint.type && gatherPoint.type !== checkPoint.type) {
       const departments = await Department.find({
         linkDepartments: {
           $elemMatch: {
@@ -65,6 +65,15 @@ class DepartmentService {
         await department.save();
       }
     }
+    console.log('flag');
+    if (gatherPoint.linkDepartments) {
+      console.log(checkPoint.linkDepartments);
+      console.log(gatherPoint.linkDepartments);
+      checkPoint.linkDepartments = [...gatherPoint.linkDepartments];
+    }
+
+    delete gatherPoint.linkDepartments;
+
     checkPoint = UtilFunc.updateObj(checkPoint, gatherPoint);
 
     await checkPoint.save();
