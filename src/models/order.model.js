@@ -49,3 +49,4 @@ const oderSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('GatheringPoint', oderSchema);
+
