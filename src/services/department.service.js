@@ -4,7 +4,7 @@ const UtilFunc = require("../utils/utils");
 
 class DepartmentService {
   static get = async (query) => {
-    query = UtilFunc.getQuery(condition);
+    query = UtilFunc.getQuery(query);
 
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;

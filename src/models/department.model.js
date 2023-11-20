@@ -56,6 +56,5 @@ departmentSchema.pre('remove', function (next) {
       .then(() => next())
       .catch(err => next(err));
   });
-  
 
 module.exports = mongoose.model('Department', departmentSchema);

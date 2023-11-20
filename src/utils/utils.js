@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
 
 class UtilFunc {
     static getInfoData = ({fields = [], object = {}}) => {
@@ -29,6 +30,14 @@ class UtilFunc {
             }
         }
         return query;
+    }
+
+    static generateAccessToken = (user) => {
+        return jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1d'});
+    }
+
+    static generateRefreshToken = (user) => {
+        return jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '5d'});
     }
 }
 

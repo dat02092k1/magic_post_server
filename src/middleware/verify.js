@@ -25,12 +25,6 @@ class verifyMiddileware {
     }
 
     isAdmin = asyncHandler(async (req, res, next) => {
-        const apiKey = req.headers[utilContainers.HEADER.API_KEY];
-
-        if (!apiKey) throw new Api403Error('Forbidden request');
-
-        if (apiKey !== process.env.API_KEY) throw new Api403Error('Forbidden request');
-
         this.verifyToken(req, res, () => {
             if (req.user.role !== UtilConstant.roleUsers['admin']) throw new Api403Error('Only admin can do this');
             next();
