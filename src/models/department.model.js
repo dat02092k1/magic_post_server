@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./user.model');
+const UtilConstant = require("../utils/constants");
 // const gatheringPointSchema = new mongoose.Schema({
 //     name: {
 //         type: String,
@@ -36,6 +37,7 @@ const departmentSchema = new mongoose.Schema({
     }, 
     type: {
         type: String,
+        enum: UtilConstant.typeDepartment,
         required: true,
     },
     linkDepartments: [{

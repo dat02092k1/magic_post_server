@@ -8,6 +8,7 @@ const UtilConstant = {
         CLIENT_ID: 'x-client-id',
         AUTHORIZATION: 'authorization',
     },
+    typeDepartment: ['Gathering', 'Transaction'],
 }
 
 module.exports = UtilConstant;
