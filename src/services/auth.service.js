@@ -1,12 +1,32 @@
 const User = require('../models/user.model');
-const {Api403Error, Api404Error} = require('../rest_core/error.response');
+const {Api403Error, Api404Error, Api401Error} = require('../rest_core/error.response');
 const mailing = require('../helpers/mail');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const UtilFunc = require("../utils/utils");
 const UtilConstants = require("../utils/constants");
+const UtilConstant = require("../utils/constants");
 
 class AuthService {
+    static login = async (userData) => {
+        const {username, password} = userData;
+
+        const user = await User.findOne({username: username}).lean();
+
+        if (!user) throw new Api404Error('User not exists');
+
+        const pass = user.password;
+
+        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);
+
+        if (pass !== hashPassword) throw new Api401Error('Wrong password');
+
+        return {
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email'], object: user }),
+            token: UtilFunc.generateAccessToken(user)
+        }
+    }
+
     static forgetPassword = async (email) => {
         const checkUser = await User.findOne({email: email}).lean();
 
@@ -54,7 +74,6 @@ class AuthService {
             user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
         }
     }
-
 }
 
 module.exports = AuthService;

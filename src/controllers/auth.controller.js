@@ -4,6 +4,10 @@ const UserService = require("../services/user.service");
 const AuthService = require("../services/auth.service");
 
 class AuthController {
+    login = asyncHandler(async (req, res, next) => {
+        OK(res, 'signin success', await AuthService.login(req.body));
+    })
+
     forgetPassword = asyncHandler(async (req, res, next) => {
         OK(res, 'send verification code', await AuthService.forgetPassword(req.body))
     })

@@ -18,7 +18,7 @@ class UserService {
         user.password = hashPassword;
         await user.save();
         return {
-            user: UtilFunc.getInfoData({fields: ['_id', 'username'], object: user}),
+            user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
         }
     }
 
@@ -33,46 +33,22 @@ class UserService {
     }
 
     static edit = async (id, user) => {
-        const userData = await User.findById(id);
+        let userData = await User.findById(id);
         if (!userData) throw new Api404Error('user not found');
 
-        userData = user;
+        userData = UtilFunc.updateObj(userData, user);
         
         await userData.save();
-        console.log("edit success");
+
     }
 
     static delete = async (id) => {
-        User.findByIdAndDelete(id, (e, deleted) => {
-            if(e){
-                console.log("ERROR: " + e);
-            } else {
-                console.log("deleted " + deleted);
-            }
-        })
-        
-    }
+        const targetUser = await User.findByIdAndDelete(id);
 
-    static login = async (username, password) => {
-        const user = await User.findOne({username: username});
-
-        if(!user){
-            return {
-                result: 'no user'
-            }
-        }
-
-        const pass = user.password;
-        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);   
-        
-        if(pass === hashPassword){
-            return {
-                result: 'success'
-            }
-        }
+        if (!targetUser) throw new Api404Error('user not found');
 
         return {
-            result: 'failed'
+            user: targetUser
         }
     }
 }
