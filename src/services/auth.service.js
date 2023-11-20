@@ -4,6 +4,7 @@ const mailing = require('../helpers/mail');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const UtilFunc = require("../utils/utils");
+const UtilConstants = require("../utils/constants");
 
 class AuthService {
     static forgetPassword = async (email) => {
@@ -30,6 +31,28 @@ class AuthService {
         return {
             user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: checkUser}),
         };
+    }
+
+    static checkVerifyCode = async (information) => {
+        const { token, password } = information;
+
+        if (!token) throw new Api403Error('Token is required');
+
+        const decoded = jwt.verify(token, process.env.JWT_PASSWORD);
+
+        const user = await User.findById(decoded.userId);
+
+        if (!user) throw new Api404Error('User not found');
+
+        const hashedPassword = await bcrypt.hash(password, UtilConstants.SAL_ROUNDS);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        return {
+            user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
+        }
     }
 
 }
