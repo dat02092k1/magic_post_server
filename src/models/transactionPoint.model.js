@@ -11,7 +11,6 @@ const transactionPointSchema = new mongoose.Schema({
     },  
     gatheringPointId: {
         type: mongoose.Schema.Types.ObjectId, 
-        required: true,
         ref: 'GatheringPoint',
         index: true
     },
