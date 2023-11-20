@@ -18,6 +18,10 @@ class UserController {
     delete = asyncHandler(async (req, res, next) => {
         OK(res, 'delete user success', await UserService.delete(req.params.id))
     })
+
+    login = asyncHandler(async (req, res, next) => {
+        OK(res, 'login success', await UserService.login(req.params.usename, req.params.password))
+    })
 }
 
 module.exports = new UserController();

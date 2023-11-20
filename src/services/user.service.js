@@ -52,6 +52,29 @@ class UserService {
         })
         
     }
+
+    static login = async (username, password) => {
+        const user = await User.findOne({username: username});
+
+        if(!user){
+            return {
+                result: 'no user'
+            }
+        }
+
+        const pass = user.password;
+        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);   
+        
+        if(pass === hashPassword){
+            return {
+                result: 'success'
+            }
+        }
+
+        return {
+            result: 'failed'
+        }
+    }
 }
 
 module.exports = UserService;
