@@ -7,6 +7,10 @@ class AuthController {
     forgetPassword = asyncHandler(async (req, res, next) => {
         OK(res, 'send verification code', await AuthService.forgetPassword(req.body))
     })
+
+    resetPassword = asyncHandler(async (req, res, next) => {
+        OK(res, 'reset password success', await AuthService.checkVerifyCode(req.body))
+    })
 }
 
 module.exports = new AuthController();
