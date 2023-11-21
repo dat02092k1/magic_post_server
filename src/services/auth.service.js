@@ -9,20 +9,18 @@ const UtilConstant = require("../utils/constants");
 
 class AuthService {
     static login = async (userData) => {
-        const {username, password} = userData;
-
-        const user = await User.findOne({username: username}).lean();
+        const {email, password} = userData;
+        console.log(userData);
+        const user = await User.findOne({email: email}).lean();
 
         if (!user) throw new Api404Error('User not exists');
+        console.log(password, user.password);
+        const match = await bcrypt.compare(password, user.password);
 
-        const pass = user.password;
-
-        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);
-
-        if (pass !== hashPassword) throw new Api401Error('Wrong password');
+        if (!match) throw new Api401Error('Wrong password');
 
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email'], object: user }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: user }),
             token: UtilFunc.generateAccessToken(user)
         }
     }
