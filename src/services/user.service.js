@@ -6,10 +6,9 @@ const bcrypt = require('bcrypt');
 
 class UserService {
     static create = async (userDetails) => {
-        const {username, password} = userDetails;
+        const {email, password} = userDetails;
 
-        const checkUser = await User.findOne({username: username});
-
+        const checkUser = await User.findOne({email: email}).lean();
         if (checkUser) throw new Api403Error('username already exists');
 
         const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);   

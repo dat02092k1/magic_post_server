@@ -1,4 +1,5 @@
 const Department = require("../models/department.model");
+const User = require("../models/user.model");
 const { Api403Error, Api404Error } = require("../rest_core/error.response");
 const UtilFunc = require("../utils/utils");
 
@@ -16,17 +17,32 @@ class DepartmentService {
     };
   };
 
-  static create = async (gatherPoint) => {
-    const checkPoint = await Department.findOne({ name: gatherPoint.name }).lean();
+  static create = async (data) => {
+    const { department, user } = data;
+
+    const holderUser = await User.findOne({ email: user.email }).lean();
+
+    if (holderUser) throw new Api404Error("this user existed");
+
+    const checkPoint = await Department.findOne({ name: department.name }).lean();
 
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
 
-    const newGatherPoint = new Department(gatherPoint);
+    const newGatherPoint = new Department(checkPoint);
 
     await newGatherPoint.save();
+
+    const newUser = new User({
+      ...user,
+      departmentId: newGatherPoint._id,
+    });
+
+    await newUser.save();
+
     return {
       gatherPoint: newGatherPoint,
+      user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: newUser}),
     };
   };
 
@@ -36,7 +52,7 @@ class DepartmentService {
     if (!checkPoint) throw new Api404Error("this gather point not found");
 
     return {
-      gatherPoint: checkPoint,
+      gatherPoint: (checkPoint),
     };
   };
 
