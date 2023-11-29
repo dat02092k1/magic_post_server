@@ -51,9 +51,8 @@ const departmentSchema = new mongoose.Schema({
 });
 
 departmentSchema.pre('remove', function (next) {
-      User.updateMany(
-      { departmentId: this._id },
-      { $unset: { departmentId: '' } }
+      User.deleteMany(
+      { departmentId: this._id},
     )
       .then(() => next())
       .catch(err => next(err));
