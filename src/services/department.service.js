@@ -2,6 +2,8 @@ const Department = require("../models/department.model");
 const User = require("../models/user.model");
 const { Api403Error, Api404Error } = require("../rest_core/error.response");
 const UtilFunc = require("../utils/utils");
+const bcrypt = require('bcrypt');
+const UtilConstant = require('../utils/constants');
 
 class DepartmentService {
   static get = async (query) => {
@@ -19,7 +21,7 @@ class DepartmentService {
 
   static create = async (data) => {
     const { department, user } = data;
-
+    console.log(department);
     const holderUser = await User.findOne({ email: user.email }).lean();
 
     if (holderUser) throw new Api404Error("this user existed");
@@ -29,9 +31,12 @@ class DepartmentService {
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
 
-    const newGatherPoint = new Department(checkPoint);
+    const newGatherPoint = new Department(department);
 
     await newGatherPoint.save();
+    const hashPassword = await bcrypt.hash(user.password, UtilConstant.SAL_ROUNDS);
+
+    user.password = hashPassword;
 
     const newUser = new User({
       ...user,
@@ -42,7 +47,7 @@ class DepartmentService {
 
     return {
       gatherPoint: newGatherPoint,
-      user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: newUser}),
+      user: UtilFunc.getInfoData({ fields: ['_id', 'username', 'role'], object: newUser }),
     };
   };
 
