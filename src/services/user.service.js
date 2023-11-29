@@ -6,18 +6,19 @@ const bcrypt = require('bcrypt');
 
 class UserService {
     static create = async (userDetails) => {
-        const {email, password} = userDetails;
+        const { email, password } = userDetails;
 
-        const checkUser = await User.findOne({email: email}).lean();
+        const checkUser = await User.findOne({ email: email }).lean();
         if (checkUser) throw new Api403Error('username already exists');
 
-        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);   
-         
+        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);
+
         const user = new User(userDetails);
         user.password = hashPassword;
         await user.save();
         return {
-            user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'username', 'role'], object: user }),
+            token: UtilFunc.generateAccessToken(user)
         }
     }
 
@@ -27,7 +28,7 @@ class UserService {
         if (!holderUser) throw new Api404Error('user not found');
 
         return {
-            user: UtilFunc.getInfoData({fields: ['_id', 'username'], object: holderUser}),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'username'], object: holderUser }),
         }
     }
 
@@ -36,7 +37,7 @@ class UserService {
         if (!userData) throw new Api404Error('user not found');
 
         userData = UtilFunc.updateObj(userData, user);
-        
+
         await userData.save();
 
     }
