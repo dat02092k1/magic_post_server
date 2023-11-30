@@ -56,7 +56,7 @@ class DepartmentService {
 
     if (!checkPoint) throw new Api404Error("this gather point not found");
 
-    const hdUser = await User.findOne({ departmentId: id, role: UtilConstant.roleUsers[`head${checkPoint.type}`] }).lean();
+    const hdUser = await User.findOne({ departmentId: id, role: `head${checkPoint.type}` }).lean();
 
     if (!hdUser) {
       return {
