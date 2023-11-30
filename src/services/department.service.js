@@ -56,8 +56,18 @@ class DepartmentService {
 
     if (!checkPoint) throw new Api404Error("this gather point not found");
 
+    const hdUser = await User.findOne({ departmentId: id, role: UtilConstant.roleUsers[`head${checkPoint.type}`] }).lean();
+
+    if (!hdUser) {
+      return {
+        gatherPoint: (checkPoint),
+        msg: `Điểm ${checkPoint.type === 'Gathering' ? 'tập kết' : 'giao dịch'} này chưa có trưởng điểnm`
+      };
+    }
+
     return {
       gatherPoint: (checkPoint),
+      user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: hdUser }),
     };
   };
 

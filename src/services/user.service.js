@@ -17,7 +17,7 @@ class UserService {
         user.password = hashPassword;
         await user.save();
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'username', 'role'], object: user }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: user }),
             token: UtilFunc.generateAccessToken(user)
         }
     }
@@ -28,7 +28,7 @@ class UserService {
         if (!holderUser) throw new Api404Error('user not found');
 
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'username'], object: holderUser }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: holderUser }),
         }
     }
 

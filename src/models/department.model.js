@@ -1,26 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./user.model');
 const UtilConstant = require("../utils/constants");
-// const gatheringPointSchema = new mongoose.Schema({
-//     name: {
-//         type: String,
-//         required: true,
-//     },
-//     place: {
-//         type: String,
-//         required: true,
-//     },  
-//     childTracsactionPoint: [{
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: 'TransactionPoint'
-//     }], 
-//     linkGatheringPoint: {
-//         type: Array,
-//         default: [],
-//     }
-// });
-
-// module.exports = mongoose.model('GatheringPoint', gatheringPointSchema);
 
 const departmentSchema = new mongoose.Schema({
     name: {
@@ -48,6 +28,8 @@ const departmentSchema = new mongoose.Schema({
             type: String,
         },
     }], 
+}, {
+    timestamps: true,
 });
 
 departmentSchema.pre('remove', function (next) {
