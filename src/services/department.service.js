@@ -71,12 +71,12 @@ class DepartmentService {
     };
   };
 
-  static edit = async (id, gatherPoint) => {
+  static edit = async (id, department) => {
     let checkPoint = await Department.findById(id);
 
     if (!checkPoint) throw new Api404Error("gather point not found");
 
-    if (checkPoint.type && gatherPoint.type !== checkPoint.type) {
+    if (checkPoint.type && department.type !== checkPoint.type) {
       const departments = await Department.find({
         linkDepartments: {
           $elemMatch: {
@@ -95,17 +95,30 @@ class DepartmentService {
         );
         await department.save();
       }
-    }
-    console.log('flag');
-    if (gatherPoint.linkDepartments) {
-      console.log(checkPoint.linkDepartments);
-      console.log(gatherPoint.linkDepartments);
-      checkPoint.linkDepartments = [...gatherPoint.linkDepartments];
+
+      const staffUsers = await User.find({ departmentId: checkPoint._id, role: `${checkPoint.type.toLowerCase()}Staff`});
+
+      if (staffUsers.length > 0) {
+        for (let user of staffUsers) {
+          if (user.role ===  `${checkPoint.type.toLowerCase()}Staff`) 
+          { 
+            user.role = `${department.type.toLowerCase()}Staff`; 
+          }
+          else {
+            user.role = `head${department.type}`;
+          }          
+          await user.save();
+        }
+      }
     }
 
-    delete gatherPoint.linkDepartments;
+    if (department.linkDepartments) {
+      checkPoint.linkDepartments = [...department.linkDepartments];
+    }
 
-    checkPoint = UtilFunc.updateObj(checkPoint, gatherPoint);
+    delete department.linkDepartments;
+
+    checkPoint = UtilFunc.updateObj(checkPoint, department);
 
     await checkPoint.save();
 
