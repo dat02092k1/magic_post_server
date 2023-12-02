@@ -85,31 +85,54 @@ class DepartmentService {
         },
       });
 
-      for (let department of departments) {
-        department.linkDepartments = department.linkDepartments.filter(
-          (item) => {
-            if (item.id === id) {
-              item.type = gatherPoint.type;
+      if (department.type === "Gathering") {
+        for (let department of departments) {
+          department.linkDepartments = department.linkDepartments.filter(
+            (item) => {
+              if (item.id === id) {
+                item.type = gatherPoint.type;
+              }
             }
-          }
-        );
-        await department.save();
-      }
-
-      const staffUsers = await User.find({ departmentId: checkPoint._id, role: `${checkPoint.type.toLowerCase()}Staff`});
-
-      if (staffUsers.length > 0) {
-        for (let user of staffUsers) {
-          if (user.role ===  `${checkPoint.type.toLowerCase()}Staff`) 
-          { 
-            user.role = `${department.type.toLowerCase()}Staff`; 
-          }
-          else {
-            user.role = `head${department.type}`;
-          }          
-          await user.save();
+          );
+          await department.save();
         }
       }
+      else {
+        for (let department of departments) {
+          if (department.type === "Gathering") {
+            department.linkDepartments = department.linkDepartments.filter(
+              (item) => {
+                if (item.id === id) {
+                  item.type = gatherPoint.type;
+                }
+              }
+            );
+          }
+
+          if (department.type === "Transaction") {
+            department.linkDepartments = department.linkDepartments.filter(
+              (item) => (item.id !== id)
+            ); 
+          }
+          await department.save();
+        }
+        
+      } 
+       
+      const staffUsers = await User.find({ departmentId: checkPoint._id, role: `${checkPoint.type.toLowerCase()}Staff`});
+  
+        if (staffUsers.length > 0) {
+          for (let user of staffUsers) {
+            if (user.role ===  `${checkPoint.type.toLowerCase()}Staff`) 
+            { 
+              user.role = `${department.type.toLowerCase()}Staff`; 
+            }
+            else {
+              user.role = `head${department.type}`;
+            }          
+            await user.save();
+          }
+        }
     }
 
     if (department.linkDepartments) {
