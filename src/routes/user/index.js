@@ -9,6 +9,6 @@ router.post('/user/create', verifyMiddileware.verifyToken, aclMiddleware, userCo
 router.get('/user/get/:id', userController.getDetail);
 router.put('/user/edit/:id', userController.editDetail);
 router.delete('/user/delete/:id', userController.delete);
-
+router.get('/users', userController.getByCondition);
 
 module.exports = router;

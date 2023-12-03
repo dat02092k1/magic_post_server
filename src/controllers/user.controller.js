@@ -19,8 +19,8 @@ class UserController {
         OK(res, 'delete user success', await UserService.delete(req.params.id))
     })
 
-    login = asyncHandler(async (req, res, next) => {
-        OK(res, 'login success', await UserService.login(req.params.usename, req.params.password))
+    getByCondition = asyncHandler(async (req, res, next) => {
+        OK(res, 'get success', await UserService.getByCondition(req.query))
     })
 }
 
