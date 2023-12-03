@@ -34,6 +34,13 @@ class DepartmentService {
     const newGatherPoint = new Department(department);
 
     await newGatherPoint.save();
+
+    if (department.linkDepartments.length > 0) {
+    for (let department of newGatherPoint.linkDepartments) {
+      department.linkDepartments = [...department.linkDepartments, { id: newGatherPoint._id, type: newGatherPoint.type }];
+    }
+    }
+
     const hashPassword = await bcrypt.hash(user.password, UtilConstant.SAL_ROUNDS);
 
     user.password = hashPassword;
@@ -137,6 +144,25 @@ class DepartmentService {
 
     if (department.linkDepartments) {
       checkPoint.linkDepartments = [...department.linkDepartments];
+      
+      const linkedDepartmentsToUpdate = await Department.find({
+        linkDepartments: {
+            $not: {
+                $elemMatch: {
+                    id: checkPoint._id.toString(),
+                },
+            },
+        },
+    });
+
+    // Update linkDepartments in each linked department
+    for (const linkedDepartment of linkedDepartmentsToUpdate) {
+      linkedDepartment.linkDepartments.push({
+          id: checkPoint._id.toString(),
+          type: checkPoint.type,
+      });
+      await linkedDepartment.save();
+  }
     }
 
     delete department.linkDepartments;

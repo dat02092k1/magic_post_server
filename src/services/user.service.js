@@ -57,7 +57,6 @@ class UserService {
     
         var limit = parseInt(query.limit, 10);
         limit = isNaN(limit) ? 10 : limit;
-    
         const users = await User.find(query.condition).limit(limit).sort(query.sort);
     
         return {

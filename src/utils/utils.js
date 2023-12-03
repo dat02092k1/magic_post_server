@@ -26,6 +26,7 @@ class UtilFunc {
             try {
                 query.condition = JSON.parse(query.condition);
             } catch (e) {
+                console.log(`error::${e}`);
                 query.condition = {};
             }
         }
