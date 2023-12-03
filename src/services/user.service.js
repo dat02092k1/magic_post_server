@@ -23,12 +23,12 @@ class UserService {
     }
 
     static getDetail = async (id) => {
-        const holderUser = await User.findById(id);
+        const holderUser = await User.findById(id).populate('departmentId').lean();
 
         if (!holderUser) throw new Api404Error('user not found');
 
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: holderUser }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'departmentId', 'name', 'email', 'role'], object: holderUser }),
         }
     }
 
