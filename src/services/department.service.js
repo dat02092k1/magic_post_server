@@ -2,8 +2,8 @@ const Department = require("../models/department.model");
 const User = require("../models/user.model");
 const { Api403Error, Api404Error } = require("../rest_core/error.response");
 const UtilFunc = require("../utils/utils");
-const bcrypt = require('bcrypt');
-const UtilConstant = require('../utils/constants');
+const bcrypt = require("bcrypt");
+const UtilConstant = require("../utils/constants");
 
 class DepartmentService {
   static get = async (query) => {
@@ -12,7 +12,9 @@ class DepartmentService {
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;
 
-    const departments = await Department.find(query.condition).limit(limit).sort(query.sort);
+    const departments = await Department.find(query.condition)
+      .limit(limit)
+      .sort(query.sort);
 
     return {
       departments: departments,
@@ -21,12 +23,14 @@ class DepartmentService {
 
   static create = async (data) => {
     const { department, user } = data;
-     
+
     const holderUser = await User.findOne({ email: user.email }).lean();
 
     if (holderUser) throw new Api404Error("this user existed");
 
-    const checkPoint = await Department.findOne({ name: department.name }).lean();
+    const checkPoint = await Department.findOne({
+      name: department.name,
+    }).lean();
 
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
@@ -36,19 +40,29 @@ class DepartmentService {
     await newGatherPoint.save();
 
     if (department.linkDepartments.length > 0) {
-      const updatePromises = newGatherPoint.linkDepartments.map(async (linkedDepartment) => {
-        const departmentToUpdate = await Department.findById(linkedDepartment.id);
+      const updatePromises = newGatherPoint.linkDepartments.map(
+        async (linkedDepartment) => {
+          const departmentToUpdate = await Department.findById(
+            linkedDepartment.id
+          );
 
-        if (departmentToUpdate) {
-            departmentToUpdate.linkDepartments.push({ id: newGatherPoint._id, type: newGatherPoint.type });
+          if (departmentToUpdate) {
+            departmentToUpdate.linkDepartments.push({
+              id: newGatherPoint._id,
+              type: newGatherPoint.type,
+            });
             await departmentToUpdate.save();
+          }
         }
-    });
+      );
 
-    await Promise.all(updatePromises);
+      await Promise.all(updatePromises);
     }
 
-    const hashPassword = await bcrypt.hash(user.password, UtilConstant.SAL_ROUNDS);
+    const hashPassword = await bcrypt.hash(
+      user.password,
+      UtilConstant.SAL_ROUNDS
+    );
 
     user.password = hashPassword;
 
@@ -61,7 +75,10 @@ class DepartmentService {
 
     return {
       gatherPoint: newGatherPoint,
-      user: UtilFunc.getInfoData({ fields: ['_id', 'username', 'role'], object: newUser }),
+      user: UtilFunc.getInfoData({
+        fields: ["_id", "username", "role"],
+        object: newUser,
+      }),
     };
   };
 
@@ -70,18 +87,26 @@ class DepartmentService {
 
     if (!checkPoint) throw new Api404Error("this gather point not found");
 
-    const hdUser = await User.findOne({ departmentId: id, role: `head${checkPoint.type}` }).lean();
+    const hdUser = await User.findOne({
+      departmentId: id,
+      role: `head${checkPoint.type}`,
+    }).lean();
 
     if (!hdUser) {
       return {
-        gatherPoint: (checkPoint),
-        msg: `Điểm ${checkPoint.type === 'Gathering' ? 'tập kết' : 'giao dịch'} này chưa có trưởng điểnm`
+        gatherPoint: checkPoint,
+        msg: `Điểm ${
+          checkPoint.type === "Gathering" ? "tập kết" : "giao dịch"
+        } này chưa có trưởng điểnm`,
       };
     }
 
     return {
-      gatherPoint: (checkPoint),
-      user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: hdUser }),
+      gatherPoint: checkPoint,
+      user: UtilFunc.getInfoData({
+        fields: ["_id", "name", "email", "role"],
+        object: hdUser,
+      }),
     };
   };
 
@@ -110,8 +135,7 @@ class DepartmentService {
           );
           await department.save();
         }
-      }
-      else {
+      } else {
         for (let department of departments) {
           if (department.type === "Gathering") {
             department.linkDepartments = department.linkDepartments.filter(
@@ -125,51 +149,51 @@ class DepartmentService {
 
           if (department.type === "Transaction") {
             department.linkDepartments = department.linkDepartments.filter(
-              (item) => (item.id !== id)
-            ); 
+              (item) => item.id !== id
+            );
           }
           await department.save();
         }
-        
-      } 
-       
-      const staffUsers = await User.find({ departmentId: checkPoint._id, role: `${checkPoint.type.toLowerCase()}Staff`});
-  
-        if (staffUsers.length > 0) {
-          for (let user of staffUsers) {
-            if (user.role ===  `${checkPoint.type.toLowerCase()}Staff`) 
-            { 
-              user.role = `${department.type.toLowerCase()}Staff`; 
-            }
-            else {
-              user.role = `head${department.type}`;
-            }          
-            await user.save();
+      }
+
+      const staffUsers = await User.find({
+        departmentId: checkPoint._id,
+        role: `${checkPoint.type.toLowerCase()}Staff`,
+      });
+
+      if (staffUsers.length > 0) {
+        for (let user of staffUsers) {
+          if (user.role === `${checkPoint.type.toLowerCase()}Staff`) {
+            user.role = `${department.type.toLowerCase()}Staff`;
+          } else {
+            user.role = `head${department.type}`;
           }
+          await user.save();
         }
+      }
     }
 
     if (department.linkDepartments) {
       checkPoint.linkDepartments = [...department.linkDepartments];
-      
+
       const linkedDepartmentsToUpdate = await Department.find({
         linkDepartments: {
-            $not: {
-                $elemMatch: {
-                    id: checkPoint._id.toString(),
-                },
+          $not: {
+            $elemMatch: {
+              id: checkPoint._id.toString(),
             },
+          },
         },
-    });
+      });
 
-    // Update linkDepartments in each linked department
-    for (const linkedDepartment of linkedDepartmentsToUpdate) {
-      linkedDepartment.linkDepartments.push({
+      // Update linkDepartments in each linked department
+      for (const linkedDepartment of linkedDepartmentsToUpdate) {
+        linkedDepartment.linkDepartments.push({
           id: checkPoint._id.toString(),
           type: checkPoint.type,
-      });
-      await linkedDepartment.save();
-  }
+        });
+        await linkedDepartment.save();
+      }
     }
 
     delete department.linkDepartments;
