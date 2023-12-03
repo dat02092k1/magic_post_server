@@ -48,7 +48,7 @@ class DepartmentService {
            
           if (departmentToUpdate) {
             departmentToUpdate.linkDepartments.push({
-              id: newGatherPoint._id,
+              _id: newGatherPoint._id,
               type: newGatherPoint.type,
             });
             await departmentToUpdate.save();
