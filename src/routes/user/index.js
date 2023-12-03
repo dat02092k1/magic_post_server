@@ -5,10 +5,10 @@ const verifyMiddileware = require('../../middleware/verify');
 const { aclMiddleware } = require('../../middleware/aclMiddleware');
 
 
-router.post('/user/create', verifyMiddileware.verifyToken, aclMiddleware, userController.create);
-router.get('/user/get/:id', userController.getDetail);
-router.put('/user/edit/:id', userController.editDetail);
-router.delete('/user/delete/:id', userController.delete);
+router.post('/user', verifyMiddileware.verifyToken, aclMiddleware, userController.create);
+router.get('/user/:id', userController.getDetail);
+router.put('/user/:id', userController.editDetail);
+router.delete('/user/:id', userController.delete);
 router.get('/users', userController.getByCondition);
 
 module.exports = router;
