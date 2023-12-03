@@ -27,11 +27,11 @@ class DepartmentService {
     const holderUser = await User.findOne({ email: user.email }).lean();
 
     if (holderUser) throw new Api404Error("this user existed");
-
+    console.log(department);
     const checkPoint = await Department.findOne({
       name: department.name,
     }).lean();
-
+     
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
 
@@ -39,13 +39,13 @@ class DepartmentService {
 
     await newGatherPoint.save();
 
-    if (department.linkDepartments.length > 0) {
+    if (newGatherPoint.linkDepartments.length > 0) {
       const updatePromises = newGatherPoint.linkDepartments.map(
         async (linkedDepartment) => {
           const departmentToUpdate = await Department.findById(
-            linkedDepartment.id
+            linkedDepartment._id
           );
-
+           
           if (departmentToUpdate) {
             departmentToUpdate.linkDepartments.push({
               id: newGatherPoint._id,
@@ -180,7 +180,7 @@ class DepartmentService {
         linkDepartments: {
           $not: {
             $elemMatch: {
-              id: checkPoint._id.toString(),
+              _id: checkPoint._id.toString(),
             },
           },
         },
@@ -189,7 +189,7 @@ class DepartmentService {
       // Update linkDepartments in each linked department
       for (const linkedDepartment of linkedDepartmentsToUpdate) {
         linkedDepartment.linkDepartments.push({
-          id: checkPoint._id.toString(),
+          _id: checkPoint._id.toString(),
           type: checkPoint.type,
         });
         await linkedDepartment.save();
