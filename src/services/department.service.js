@@ -21,7 +21,7 @@ class DepartmentService {
 
   static create = async (data) => {
     const { department, user } = data;
-    console.log(department);
+     
     const holderUser = await User.findOne({ email: user.email }).lean();
 
     if (holderUser) throw new Api404Error("this user existed");
@@ -36,9 +36,16 @@ class DepartmentService {
     await newGatherPoint.save();
 
     if (department.linkDepartments.length > 0) {
-    for (let department of newGatherPoint.linkDepartments) {
-      department.linkDepartments = [...department.linkDepartments, { id: newGatherPoint._id, type: newGatherPoint.type }];
-    }
+      const updatePromises = newGatherPoint.linkDepartments.map(async (linkedDepartment) => {
+        const departmentToUpdate = await Department.findById(linkedDepartment.id);
+
+        if (departmentToUpdate) {
+            departmentToUpdate.linkDepartments.push({ id: newGatherPoint._id, type: newGatherPoint.type });
+            await departmentToUpdate.save();
+        }
+    });
+
+    await Promise.all(updatePromises);
     }
 
     const hashPassword = await bcrypt.hash(user.password, UtilConstant.SAL_ROUNDS);
