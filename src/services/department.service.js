@@ -31,7 +31,7 @@ class DepartmentService {
     const checkPoint = await Department.findOne({
       name: department.name,
     }).lean();
-     
+
     if (checkPoint)
       throw new Api403Error("this gathering point already exists");
 
@@ -45,7 +45,7 @@ class DepartmentService {
           const departmentToUpdate = await Department.findById(
             linkedDepartment.departmentId
           );
-           
+
           if (departmentToUpdate) {
             departmentToUpdate.linkDepartments.push({
               departmentId: newGatherPoint._id,
@@ -95,9 +95,8 @@ class DepartmentService {
     if (!hdUser) {
       return {
         gatherPoint: checkPoint,
-        msg: `Điểm ${
-          checkPoint.type === "Gathering" ? "tập kết" : "giao dịch"
-        } này chưa có trưởng điểnm`,
+        msg: `Điểm ${checkPoint.type === "Gathering" ? "tập kết" : "giao dịch"
+          } này chưa có trưởng điểnm`,
       };
     }
 
@@ -176,23 +175,51 @@ class DepartmentService {
     if (department.linkDepartments) {
       checkPoint.linkDepartments = [...department.linkDepartments];
 
-      const linkedDepartmentsToUpdate = await Department.find({
-        linkDepartments: {
-          $not: {
+      if (department.linkDepartments.length > 0) {
+        const linkedDepartmentsToUpdate = await Department.find({
+          linkDepartments: {
+            $not: {
+              $elemMatch: {
+                departmentId: checkPoint._id.toString(),
+              },
+            },
+          },
+        });
+        // Update linkDepartments in each linked department
+        for (const linkedDepartment of linkedDepartmentsToUpdate) {
+          linkedDepartment.linkDepartments.push({
+            departmentId: checkPoint._id.toString(),
+            type: checkPoint.type,
+          });
+          await linkedDepartment.save();
+        }
+      }
+      else {
+        console.log(checkPoint._id.toString());
+        const linkedDepartmentsToUpdate = await Department.find({
+          linkDepartments: {
             $elemMatch: {
               departmentId: checkPoint._id.toString(),
             },
           },
-        },
-      });
-
-      // Update linkDepartments in each linked department
-      for (const linkedDepartment of linkedDepartmentsToUpdate) {
-        linkedDepartment.linkDepartments.push({
-          departmentId: checkPoint._id.toString(),
-          type: checkPoint.type,
         });
-        await linkedDepartment.save();
+        console.log('delete flag');
+        console.log(linkedDepartmentsToUpdate);
+        if (linkedDepartmentsToUpdate.length > 0) {
+          for (const linkedDepartment of linkedDepartmentsToUpdate) {
+            linkedDepartment.linkDepartments = linkedDepartment.linkDepartments.map((item) => {
+              if (item.departmentId !== checkPoint._id.toString()) {
+                return item;
+              }
+            })
+            // linkedDepartment.linkDepartments.remove({
+            //   departmentId: checkPoint._id.toString(),
+            //   type: checkPoint.type,
+            // });
+            console.log(linkedDepartment.linkDepartments);
+            await linkedDepartment.save();
+          }
+        }
       }
     }
 
