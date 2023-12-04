@@ -43,12 +43,12 @@ class DepartmentService {
       const updatePromises = newGatherPoint.linkDepartments.map(
         async (linkedDepartment) => {
           const departmentToUpdate = await Department.findById(
-            linkedDepartment._id
+            linkedDepartment.departmentId
           );
            
           if (departmentToUpdate) {
             departmentToUpdate.linkDepartments.push({
-              _id: newGatherPoint._id,
+              departmentId: newGatherPoint._id,
               type: newGatherPoint.type,
             });
             await departmentToUpdate.save();
@@ -180,7 +180,7 @@ class DepartmentService {
         linkDepartments: {
           $not: {
             $elemMatch: {
-              _id: checkPoint._id.toString(),
+              departmentId: checkPoint._id.toString(),
             },
           },
         },
@@ -189,7 +189,7 @@ class DepartmentService {
       // Update linkDepartments in each linked department
       for (const linkedDepartment of linkedDepartmentsToUpdate) {
         linkedDepartment.linkDepartments.push({
-          _id: checkPoint._id.toString(),
+          departmentId: checkPoint._id.toString(),
           type: checkPoint.type,
         });
         await linkedDepartment.save();
@@ -207,24 +207,24 @@ class DepartmentService {
     };
   };
 
-  static delete = async (id) => {
-    const checkPoint = await Department.findById(id);
+  static delete = async (departmentId) => {
+    const checkPoint = await Department.findById(departmentId);
 
     if (!checkPoint) throw new Api404Error("gather point not found");
 
-    await Department.findByIdAndDelete(id);
+    await Department.findByIdAndDelete(departmentId);
 
     const departments = await Department.find({
       linkDepartments: {
         $elemMatch: {
-          id: id,
+          departmentId: departmentId,
         },
       },
     });
 
     for (let department of departments) {
       department.linkDepartments = department.linkDepartments.map((item) => {
-        if (item.id !== id) {
+        if (item.departmentId !== departmentId) {
           return item;
         }
       });

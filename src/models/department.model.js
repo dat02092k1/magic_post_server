@@ -23,7 +23,7 @@ const departmentSchema = new mongoose.Schema(
     },
     linkDepartments: [
       {
-        id: {
+        departmentId: {
           type: String,
         },
         type: {
