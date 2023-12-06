@@ -207,11 +207,9 @@ class DepartmentService {
         console.log(linkedDepartmentsToUpdate);
         if (linkedDepartmentsToUpdate.length > 0) {
           for (const linkedDepartment of linkedDepartmentsToUpdate) {
-            linkedDepartment.linkDepartments = linkedDepartment.linkDepartments.map((item) => {
-              if (item.departmentId !== checkPoint._id.toString()) {
-                return item;
-              }
-            })
+            linkedDepartment.linkDepartments = linkedDepartment.linkDepartments.filter((item) =>
+              item.departmentId !== checkPoint._id.toString()
+            );
             // linkedDepartment.linkDepartments.remove({
             //   departmentId: checkPoint._id.toString(),
             //   type: checkPoint.type,
