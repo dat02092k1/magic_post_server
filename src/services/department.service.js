@@ -176,6 +176,7 @@ class DepartmentService {
       checkPoint.linkDepartments = [...department.linkDepartments];
 
       if (department.linkDepartments.length > 0) {
+        console.log('add flag');
         const linkedDepartmentsToUpdate = await Department.find({
           linkDepartments: {
             $not: {
@@ -185,12 +186,16 @@ class DepartmentService {
             },
           },
         });
+        console.log(linkedDepartmentsToUpdate);
         // Update linkDepartments in each linked department
         for (const linkedDepartment of linkedDepartmentsToUpdate) {
+          if (linkedDepartment._id.toString() === checkPoint._id.toString()) continue;
+
           linkedDepartment.linkDepartments.push({
             departmentId: checkPoint._id.toString(),
             type: checkPoint.type,
           });
+          console.log('push done');
           await linkedDepartment.save();
         }
       }
@@ -205,11 +210,14 @@ class DepartmentService {
         });
         console.log('delete flag');
         console.log(linkedDepartmentsToUpdate);
+        console.log('heh1');
         if (linkedDepartmentsToUpdate.length > 0) {
+          console.log('heh2');
           for (const linkedDepartment of linkedDepartmentsToUpdate) {
             linkedDepartment.linkDepartments = linkedDepartment.linkDepartments.filter((item) =>
               item.departmentId !== checkPoint._id.toString()
             );
+            console.log('filter done');
             // linkedDepartment.linkDepartments.remove({
             //   departmentId: checkPoint._id.toString(),
             //   type: checkPoint.type,
@@ -249,8 +257,8 @@ class DepartmentService {
 
     for (let department of departments) {
       department.linkDepartments = department.linkDepartments.filter((item) =>
-      item.departmentId !== checkPoint._id.toString()
-    );
+        item.departmentId !== checkPoint._id.toString()
+      );
 
       await department.save();
     }
