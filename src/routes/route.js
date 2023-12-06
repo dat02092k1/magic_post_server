@@ -9,6 +9,8 @@ const userRouter = require('./user/index')
 router.use('/v1/api', require('./auth/index'));
 router.use('/v1/api', userRouter);
 router.use('/v1/api', require('./department/index'));
+router.use('/v1/api', require('./admin/index'));
+
 // router.post('/v1/api/user/create', verifyMiddileware.verifyToken, aclMiddleware, userController.create);
 
 module.exports = router;

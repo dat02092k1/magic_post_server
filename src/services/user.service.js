@@ -70,6 +70,19 @@ class UserService {
       users: users,
     };
   };
+
+  static deleteUsersByCondition = async (condition) => {
+    console.log(condition);
+    if (!condition || typeof condition !== 'object') throw new Api403Error("Invalid condition provided"); 
+
+    const targetUsers = await User.deleteMany(condition);
+
+    if (!targetUsers) throw new Api404Error("delete failed");
+
+    return {
+      user: targetUsers,
+    };
+  }
 }
 
 module.exports = UserService;
