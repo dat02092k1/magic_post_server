@@ -12,7 +12,7 @@ class AuthController {
     OK(
       res,
       "send verification code",
-      await AuthService.forgetPassword(req.body)
+      await AuthService.forgetPassword(req.body.email)
     );
   });
 
