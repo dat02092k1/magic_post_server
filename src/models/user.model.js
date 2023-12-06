@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema({
     avatarUrl: {
         type: String,
         default: '',
+    },
+    phone: {
+        type: String,
+        default: '',
+    },
+    gender: {
+        type: String,
+        enum: UtilConstant.gender,
     }
 });
 

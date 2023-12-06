@@ -9,6 +9,7 @@ const UtilConstant = {
         AUTHORIZATION: 'authorization',
     },
     typeDepartment: ['Gathering', 'Transaction'],
+    gender: ["male", "female"]
 }
 
 module.exports = UtilConstant;

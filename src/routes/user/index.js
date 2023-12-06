@@ -7,7 +7,7 @@ const { aclMiddleware } = require("../../middleware/aclMiddleware");
 router.post(
   "/user",
   verifyMiddileware.verifyToken,
-  aclMiddleware,
+  // aclMiddleware,
   userController.create
 );
 router.get("/user/:id", userController.getDetail);
