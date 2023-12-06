@@ -178,16 +178,19 @@ class DepartmentService {
 
       if (department.linkDepartments.length > 0) {
         const removeLs = [];
-        
-        for (ds in dsList) { 
+
+        for (const ds of dsList) {
+          console.log('ds flag');
+          console.log(ds);
           if (department.linkDepartments.findIndex((item) => item.departmentId === ds.departmentId) === -1) {
             removeLs.push(ds);
           }
         }
 
-        if (removeLs.length > 0)
-        {
-          for (ds of removeLs) {
+        if (removeLs.length > 0) {
+          console.log(removeLs);
+          for (let ds of removeLs) {
+            console.log(ds);
             const dsToRemove = await Department.findById(ds.departmentId);
             dsToRemove.linkDepartments = dsToRemove.linkDepartments.filter((item) => item.departmentId !== checkPoint._id.toString());
             await dsToRemove.save();
