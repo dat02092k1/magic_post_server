@@ -173,9 +173,26 @@ class DepartmentService {
     }
 
     if (department.linkDepartments) {
+      const dsList = [...checkPoint.linkDepartments];
       checkPoint.linkDepartments = [...department.linkDepartments];
 
       if (department.linkDepartments.length > 0) {
+        const removeLs = [];
+        
+        for (ds in dsList) { 
+          if (department.linkDepartments.findIndex((item) => item.departmentId === ds.departmentId) === -1) {
+            removeLs.push(ds);
+          }
+        }
+
+        if (removeLs.length > 0)
+        {
+          for (ds of removeLs) {
+            const dsToRemove = await Department.findById(ds.departmentId);
+            dsToRemove.linkDepartments = dsToRemove.linkDepartments.filter((item) => item.departmentId !== checkPoint._id.toString());
+            await dsToRemove.save();
+          }
+        }
         console.log('add flag');
         const linkedDepartmentsToUpdate = await Department.find({
           linkDepartments: {
