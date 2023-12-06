@@ -248,11 +248,9 @@ class DepartmentService {
     });
 
     for (let department of departments) {
-      department.linkDepartments = department.linkDepartments.map((item) => {
-        if (item.departmentId !== departmentId) {
-          return item;
-        }
-      });
+      department.linkDepartments = department.linkDepartments.filter((item) =>
+      item.departmentId !== checkPoint._id.toString()
+    );
 
       await department.save();
     }
