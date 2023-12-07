@@ -113,7 +113,8 @@ class DepartmentService {
     let checkPoint = await Department.findById(id);
 
     if (!checkPoint) throw new Api404Error("gather point not found");
-
+    console.log('quao');
+    console.log(checkPoint);
     if (checkPoint.type && department.type !== checkPoint.type) {
       const departments = await Department.find({
         linkDepartments: {
@@ -134,7 +135,9 @@ class DepartmentService {
           );
           await department.save();
         }
-      } else {
+      } 
+                          
+      if (department.type === "Transaction") {
         for (let department of departments) {
           if (department.type === "Gathering") {
             department.linkDepartments = department.linkDepartments.filter(
@@ -179,23 +182,27 @@ class DepartmentService {
       if (department.linkDepartments.length > 0) {
         const removeLs = [];
 
+        console.log('ds flag');
+        console.log(dsList)
         for (const ds of dsList) {
-          console.log('ds flag');
-          console.log(ds);
-          if (department.linkDepartments.findIndex((item) => item.departmentId === ds.departmentId) === -1) {
-            removeLs.push(ds);
-          }
+          const targetDep = await Department.findById(ds.departmentId);    
+          targetDep.linkDepartments = targetDep.linkDepartments.filter((item) => item.departmentId !== checkPoint._id.toString());
+          console.log(targetDep.linkDepartments);
+          await targetDep.save();      
+          // if (department.linkDepartments.findIndex((item) => item.departmentId === ds.departmentId) === -1) {
+          //   removeLs.push(ds);
+          // }
         }
 
-        if (removeLs.length > 0) {
-          console.log(removeLs);
-          for (let ds of removeLs) {
-            console.log(ds);
-            const dsToRemove = await Department.findById(ds.departmentId);
-            dsToRemove.linkDepartments = dsToRemove.linkDepartments.filter((item) => item.departmentId !== checkPoint._id.toString());
-            await dsToRemove.save();
-          }
-        }
+        // if (removeLs.length > 0) {
+        //   console.log(removeLs);
+        //   for (let ds of removeLs) {
+        //     console.log(ds);
+        //     const dsToRemove = await Department.findById(ds.departmentId);
+        //     dsToRemove.linkDepartments = dsToRemove.linkDepartments.filter((item) => item.departmentId !== checkPoint._id.toString());
+        //     await dsToRemove.save();
+        //   }
+        // }
         console.log('add flag');
         const linkedDepartmentsToUpdate = await Department.find({
           linkDepartments: {
@@ -207,9 +214,10 @@ class DepartmentService {
           },
         });
         console.log(linkedDepartmentsToUpdate);
+        const mapId = linkedDepartmentsToUpdate.map((item) => item._id.toString());
         // Update linkDepartments in each linked department
         for (const linkedDepartment of linkedDepartmentsToUpdate) {
-          if (linkedDepartment._id.toString() === checkPoint._id.toString()) continue;
+          if (linkedDepartment._id.toString() === checkPoint._id.toString() && mapId.includes(linkedDepartment._id)) continue;
 
           linkedDepartment.linkDepartments.push({
             departmentId: checkPoint._id.toString(),
