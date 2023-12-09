@@ -214,16 +214,17 @@ class DepartmentService {
           },
         });
         console.log(linkedDepartmentsToUpdate);
-        const mapId = linkedDepartmentsToUpdate.map((item) => item._id.toString());
+        const mapId = department.linkDepartments.map((item) => item.departmentId.toString());
         // Update linkDepartments in each linked department
         for (const linkedDepartment of linkedDepartmentsToUpdate) {
-          if (linkedDepartment._id.toString() === checkPoint._id.toString() && mapId.includes(linkedDepartment._id)) continue;
-
+          if (linkedDepartment._id.toString() === checkPoint._id.toString() || !(mapId.includes(linkedDepartment._id.toString()))) continue;
+            console.log('heh');
+          console.log(checkPoint._id.toString());
           linkedDepartment.linkDepartments.push({
             departmentId: checkPoint._id.toString(),
             type: checkPoint.type,
           });
-          console.log('push done');
+
           await linkedDepartment.save();
         }
       }
