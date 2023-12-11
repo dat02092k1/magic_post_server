@@ -58,7 +58,7 @@ class UserService {
   };
 
   static getByCondition = async (query) => {
-    query = UtilFunc.getQuery(query);
+    //query = UtilFunc.getQuery(query);
 
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;
