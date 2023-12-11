@@ -20,7 +20,7 @@ class AuthService {
         if (!match) throw new Api401Error('Wrong password');
 
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role'], object: user }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role', 'departmentId'], object: user }),
             token: UtilFunc.generateAccessToken(user)
         }
     }

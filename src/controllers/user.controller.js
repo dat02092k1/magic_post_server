@@ -19,9 +19,16 @@ class UserController {
         OK(res, 'delete user success', await UserService.delete(req.params.id))
     })
 
+<<<<<<< Updated upstream
     login = asyncHandler(async (req, res, next) => {
         OK(res, 'login success', await UserService.login(req.params.usename, req.params.password))
     })
+=======
+  getByCondition = asyncHandler(async (req, res, next) => {
+    console.log("req.query", req.query);
+    OK(res, "get success", await UserService.getByCondition(req.query));
+  });
+>>>>>>> Stashed changes
 }
 
 module.exports = new UserController();

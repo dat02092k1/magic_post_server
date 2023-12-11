@@ -9,8 +9,9 @@ class verifyMiddileware {
     verifyToken = (req, res, next) => {
         const token = req.headers[utilContainers.HEADER.AUTHORIZATION];
         if (token) {
+            console.log(token);
             const accessToken = token.split(" ")[1];
-
+            console.log(accessToken);
             jwt.verify(accessToken, process.env.JWT_SECRET, (err, user) => {
                 if (err) {
                     console.log(err);
