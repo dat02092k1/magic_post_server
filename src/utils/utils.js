@@ -33,6 +33,21 @@ class UtilFunc {
     return query;
   }
 
+  static conditionQuery = (query) => {
+    if (!query.condition) {
+      query.condition = {};
+    } else {
+      try {
+        console.log(JSON.stringify(query.condition));
+        query.condition = JSON.parse(JSON.stringify(query.condition));
+      } catch (e) {
+        console.log(`error::${e}`);
+        query.condition = {};
+      }
+    }
+    return query;
+  };
+
   static generateAccessToken = (user) => {
     return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "1d",

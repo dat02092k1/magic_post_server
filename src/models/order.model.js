@@ -8,9 +8,11 @@ const oderSchema = new mongoose.Schema({
     },
     senderPhone: { 
         type: String,
+        required: true
     }, 
     receiverPhone: {
         type: String,
+        required: true
     }, 
     type: { 
         type: String,
@@ -35,6 +37,10 @@ const oderSchema = new mongoose.Schema({
         ref: 'Department',
         required: true,
     },
+    next_department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
+    },
     description: {
         type: String,
         required: true, 
@@ -58,5 +64,5 @@ const oderSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-module.exports = mongoose.model('GatheringPoint', oderSchema);
+module.exports = mongoose.model('orders', oderSchema);
 
