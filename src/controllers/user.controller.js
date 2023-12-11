@@ -26,6 +26,10 @@ class UserController {
   getByCondition = asyncHandler(async (req, res, next) => {
     OK(res, "get success", await UserService.getByCondition(req.query));
   });
+
+  importUsers = asyncHandler(async (req, res, next) => {
+    OK(res, "import success", await UserService.importUsers(req));
+  });
 }
 
 module.exports = new UserController();

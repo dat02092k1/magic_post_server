@@ -62,7 +62,8 @@ class UserService {
 
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;
-    const users = await User.find(query.condition)
+    query.condition = JSON.parse(JSON.stringify(query.condition));
+    const users = await User.find(JSON.parse(JSON.stringify(query.condition)))
       .limit(limit)
       .sort(query.sort);
 
