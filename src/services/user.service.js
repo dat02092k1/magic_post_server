@@ -46,13 +46,6 @@ class UserService {
         const targetUser = await User.findByIdAndDelete(id);
 
         if (!targetUser) throw new Api404Error('user not found');
-
-<<<<<<< Updated upstream
-        return {
-            user: targetUser
-        }
-    }
-=======
     return {
       user: targetUser,
     };
@@ -85,7 +78,7 @@ class UserService {
       user: targetUsers,
     };
   }
->>>>>>> Stashed changes
+
 }
 
 module.exports = UserService;

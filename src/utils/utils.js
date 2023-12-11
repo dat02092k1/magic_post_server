@@ -2,11 +2,6 @@ const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
 class UtilFunc {
-<<<<<<< Updated upstream
-    static getInfoData = ({fields = [], object = {}}) => {
-        return _.pick(object, fields);
-    }
-=======
   static getInfoData = ({ fields = [], object = {} }) => {
     return _.pick(object, fields);
   };
@@ -40,8 +35,6 @@ class UtilFunc {
     // }
     return query;
   }
->>>>>>> Stashed changes
-
     static updateObj (targetObj, newObj) {
         return _.extend(targetObj, newObj);
     }
@@ -58,13 +51,14 @@ class UtilFunc {
         }
         if (!query.condition) {
             query.condition = {};
-        } else {
-            try {
-                query.condition = JSON.parse(query.condition);
-            } catch (e) {
-                query.condition = {};
-            }
         }
+        // } else {
+        //     try {
+        //         query.condition = JSON.parse(query.condition);
+        //     } catch (e) {
+        //         query.condition = {};
+        //     }
+        // }
         return query;
     }
 
