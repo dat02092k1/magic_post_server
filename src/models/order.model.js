@@ -20,10 +20,21 @@ const oderSchema = new mongoose.Schema({
         type: String,
         required: true,
     },  
-    targetPlace: {
-        type: String,
+    send_department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
         required: true,
     }, 
+    receive_department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
+        required: true,
+    },
+    current_department: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Department',
+        required: true,
+    },
     description: {
         type: String,
         required: true, 
@@ -36,13 +47,12 @@ const oderSchema = new mongoose.Schema({
         type: String,
         enum: UtilConstant.statusOrder,
     },
-    weigh: {
+    weight: {
         type: String,
         default: '0 - 5kg', 
     },
-    orderChild: {
-        type: Array,
-        default: [],
+    expectedDate:{
+        type: Date,
     },
 }, {
     timestamps: true,

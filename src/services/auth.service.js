@@ -41,7 +41,7 @@ class AuthService {
             <br> 
              <b>${token}</b>
             <br>
-            <a href="${process.env.CLIENT_URL}/reset-password/${user._id}">Nhấn vào đây để thiết lập mật khẩu mới</a>
+            <a href="${process.env.CLIENT_URL}/reset-password/${checkUser._id}">Nhấn vào đây để thiết lập mật khẩu mới</a>
             </div>`;
 
         await mailing(to, subject, html);
@@ -53,11 +53,11 @@ class AuthService {
 
     static checkVerifyCode = async (information) => {
         const { token, password } = information;
-
+        console.log(information);
         if (!token) throw new Api403Error('Token is required');
 
         const decoded = jwt.verify(token, process.env.JWT_PASSWORD);
-
+        console.log(decoded);
         const user = await User.findById(decoded.userId);
 
         if (!user) throw new Api404Error('User not found');

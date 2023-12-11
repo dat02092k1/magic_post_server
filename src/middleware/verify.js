@@ -1,13 +1,12 @@
 const jwt = require("jsonwebtoken");
-const utilContainers = require("../shared/constants");
-const {Api403Error, Api404Error, Api401Error} = require("../core/error.response");
+const {Api403Error, Api404Error, Api401Error} = require("../rest_core/error.response");
 const {asyncHandler} = require("./auth");
 const UtilConstant = require("../utils/constants");
 require('dotenv').config();
 
 class verifyMiddileware {
     verifyToken = (req, res, next) => {
-        const token = req.headers[utilContainers.HEADER.AUTHORIZATION];
+        const token = req.headers[UtilConstant.HEADER.AUTHORIZATION];
         if (token) {
             console.log(token);
             const accessToken = token.split(" ")[1];
@@ -34,14 +33,14 @@ class verifyMiddileware {
 
     isHeadGathering = asyncHandler(async (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.role !== utilContainers.roleUsers['headGathering'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headGathering can do this');
+            if (req.user.role !== UtilConstant.roleUsers['headGathering'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headGathering can do this');
             next();
         })
     })
 
     isHeadTransaction = asyncHandler(async (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.role !== utilContainers.roleUsers['headTransaction'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headTransaction can do this');
+            if (req.user.role !== UtilConstant.roleUsers['headTransaction'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headTransaction can do this');
             next();
         })
     })

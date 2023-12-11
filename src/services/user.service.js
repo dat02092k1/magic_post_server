@@ -1,60 +1,65 @@
-const User = require('../models/user.model');
-const { Api403Error, Api404Error } = require('../rest_core/error.response');
-const UtilConstant = require('../utils/constants');
-const UtilFunc = require('../utils/utils');
-const bcrypt = require('bcrypt');
+const User = require("../models/user.model");
+const { Api403Error, Api404Error } = require("../rest_core/error.response");
+const UtilConstant = require("../utils/constants");
+const UtilFunc = require("../utils/utils");
+const bcrypt = require("bcrypt");
 
 class UserService {
-    static create = async (userDetails) => {
-        const {username, password} = userDetails;
+  static create = async (userDetails) => {
+    const { email, password } = userDetails;
 
-        const checkUser = await User.findOne({username: username});
+    const checkUser = await User.findOne({ email: email }).lean();
+    if (checkUser) throw new Api403Error("username already exists");
 
-        if (checkUser) throw new Api403Error('username already exists');
+    const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);
 
-        const hashPassword = await bcrypt.hash(password, UtilConstant.SAL_ROUNDS);   
-         
-        const user = new User(userDetails);
-        user.password = hashPassword;
-        await user.save();
-        return {
-            user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
-        }
-    }
+    const user = new User(userDetails);
+    user.password = hashPassword;
+    await user.save();
+    return {
+      user: UtilFunc.getInfoData({
+        fields: ["_id", "name", "email", "role"],
+        object: user,
+      }),
+      token: UtilFunc.generateAccessToken(user),
+    };
+  };
 
-    static getDetail = async (id) => {
-        const holderUser = await User.findById(id);
+  static getDetail = async (id) => {
+    const holderUser = await User.findById(id).populate("departmentId").lean();
 
-        if (!holderUser) throw new Api404Error('user not found');
+    if (!holderUser) throw new Api404Error("user not found");
 
-        return {
-            user: UtilFunc.getInfoData({fields: ['_id', 'username'], object: holderUser}),
-        }
-    }
+    return {
+      user: UtilFunc.getInfoData({
+        fields: ["_id", "departmentId", "name", "email", "role"],
+        object: holderUser,
+      }),
+    };
+  };
 
-    static edit = async (id, user) => {
-        let userData = await User.findById(id);
-        if (!userData) throw new Api404Error('user not found');
+  static edit = async (id, user) => {
+    let userData = await User.findById(id);
+    if (!userData) throw new Api404Error("user not found");
 
-        userData = UtilFunc.updateObj(userData, user);
-        
-        await userData.save();
+    userData = UtilFunc.updateObj(userData, user);
 
-    }
+    await userData.save();
+  };
 
-    static delete = async (id) => {
-        const targetUser = await User.findByIdAndDelete(id);
+  static delete = async (id) => {
+    const targetUser = await User.findByIdAndDelete(id);
 
-        if (!targetUser) throw new Api404Error('user not found');
+    if (!targetUser) throw new Api404Error("user not found");
+
     return {
       user: targetUser,
     };
   };
 
   static getByCondition = async (query) => {
-    console.log(query);
     query = UtilFunc.getQuery(query);
-    console.log(query);
+
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;
     const users = await User.find(query.condition)
@@ -78,7 +83,6 @@ class UserService {
       user: targetUsers,
     };
   }
-
 }
 
 module.exports = UserService;
