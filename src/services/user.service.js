@@ -32,7 +32,7 @@ class UserService {
 
     return {
       user: UtilFunc.getInfoData({
-        fields: ["_id", "departmentId", "name", "email", "role"],
+        fields: ['_id', 'name', 'email', 'role', 'phone', 'gender', 'departmentId'],
         object: holderUser,
       }),
     };
