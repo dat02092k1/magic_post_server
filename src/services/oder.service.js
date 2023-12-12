@@ -35,7 +35,18 @@ class OrderService {
 
     static async getOrderDetails(id) {
         const order = await Order.findById(id).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
+          
+        if (order.current_department.linkDepartments.length > 0)
+        {
+            const departmentPromises = order.current_department.linkDepartments.map(async (item) => {
+                const dep = await Department.findById(item.departmentId).lean();
+                console.log(dep);
+                item['name'] = dep.name;
+              });
 
+              await Promise.all(departmentPromises);
+        }
+        
         if (!order) throw new Api404Error("order not found");
 
         return {

@@ -85,7 +85,7 @@ class DepartmentService {
   static getDetail = async (id) => {
     const checkPoint = await Department.findById(id).lean();
 
-    if (!checkPoint) throw new Api404Error("this gather point not found");
+    if (!checkPoint) throw new Api404Error("this department not found");
 
     const hdUser = await User.findOne({
       departmentId: id,
