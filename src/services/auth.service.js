@@ -72,6 +72,14 @@ class AuthService {
             user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
         }
     }
+
+    static logout = async () => {
+        res.clearCookie("refreshToken");
+
+        return {
+            'message': 'remove refresh token success',
+        } 
+    }
 }
 
 module.exports = AuthService;

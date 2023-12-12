@@ -9,5 +9,6 @@ router.get("/orders/department/:id", orderController.getCurrentDepartment);
 router.post("/orders", orderController.get);
 router.delete("/orders/:id", orderController.delete);
 router.put("/orders/:id", orderController.update);
+router.get("/orders/:id", orderController.getDetails);
 
 module.exports = router;

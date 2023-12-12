@@ -12,6 +12,10 @@ class OrderController {
     OK(res, "get orders", await OrderService.getOrders());
   });
 
+  getDetails = asyncHandler(async (req, res, next) => {
+    OK(res, "get order details", await OrderService.getOrderDetails(req.params.id));
+  });
+
   getCurrentDepartment = asyncHandler(async (req, res, next) => {
     OK(
       res,

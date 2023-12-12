@@ -33,6 +33,16 @@ class OrderService {
         }
     }
 
+    static async getOrderDetails(id) {
+        const order = await Order.findById(id).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
+
+        if (!order) throw new Api404Error("order not found");
+
+        return {
+            order: order,
+        }
+    }
+
     static async getOrdersByDepartmentId(departmentId) {
         return {
             orders: await Order.find({current_department: departmentId}).lean(),
