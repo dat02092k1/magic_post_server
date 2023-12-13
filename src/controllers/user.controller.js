@@ -4,7 +4,7 @@ const UserService = require("../services/user.service");
 
 class UserController {
   create = asyncHandler(async (req, res, next) => {
-    CREATED(res, "create success", await UserService.create(req.body));
+    CREATED(res, "create success", await UserService.create(req.body, req.file));
   });
 
   getDetail = asyncHandler(async (req, res, next) => {

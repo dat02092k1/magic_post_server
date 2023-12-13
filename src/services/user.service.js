@@ -3,9 +3,10 @@ const { Api403Error, Api404Error } = require("../rest_core/error.response");
 const UtilConstant = require("../utils/constants");
 const UtilFunc = require("../utils/utils");
 const bcrypt = require("bcrypt");
+const { cloudinary } = require("../helpers/cloudinary");
 
 class UserService {
-  static create = async (userDetails) => {
+  static create = async (userDetails, file) => {
     const { email, password } = userDetails;
 
     const checkUser = await User.findOne({ email: email }).lean();
@@ -15,7 +16,27 @@ class UserService {
 
     const user = new User(userDetails);
     user.password = hashPassword;
+    
+    if (file) {
+      if (!file.mimetype.startsWith('image/')) throw new Api403Error('Only image files are allowed');
+
+      cloudinary.uploader.upload(file.path, 
+        {
+          folder: 'File_img_CVHT_UET'
+        }, (error, result) => {
+        if (error) {
+          console.log('Error uploading image', error);
+          throw new Api404Error('Error uploading image');
+        } else {
+          console.log('Image uploaded successfully', result);
+          user.avatarUrl = result.secure_url;
+        }
+      }
+      ); 
+    }
+
     await user.save();
+
     return {
       user: UtilFunc.getInfoData({
         fields: ["_id", "name", "email", "role"],
