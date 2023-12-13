@@ -40,6 +40,7 @@ const oderSchema = new mongoose.Schema({
     next_department: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Department',
+        required: true
     },
     description: {
         type: String,

@@ -20,6 +20,7 @@ class OrderService {
         const nextDep = await Department.findById(order.next_department).lean();
         if (!nextDep) throw new Api404Error("next department not found");
 
+        newOrder['status'] = 'processing';
         await newOrder.save(); 
 
         return {
