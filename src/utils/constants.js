@@ -1,7 +1,7 @@
 const UtilConstant = {
     roleUsers: ["admin", 'headGathering', "headTransaction", 'transactionStaff', 'gatheringStaff'],
     SAL_ROUNDS: 10,
-    statusOrder: ['processing', 'accepted', 'rejected', 'delivered'],
+    statusOrder: ['processing', 'accepted', 'rejected', 'cancelled', 'delivered'],
     typeOrder: ['document', 'goods'],
     HEADER: {
         API_KEY: 'x-api-key',
