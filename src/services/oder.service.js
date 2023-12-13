@@ -1,6 +1,7 @@
 const Order = require("../models/order.model");
 const Department = require("../models/department.model");
 const UtilFunc = require("../utils/utils");
+const {Api404Error} = require("../rest_core/error.response");
 
 class OrderService {    
     static async createOrder(order) {
