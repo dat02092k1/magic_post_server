@@ -2,7 +2,7 @@ const UtilConstant = {
     roleUsers: ["admin", 'headGathering', "headTransaction", 'transactionStaff', 'gatheringStaff'],
     SAL_ROUNDS: 10,
     statusOrder: ['pending', 'accepted', 'rejected', 'delivered'],
-    typeOrder: ['Tài liệu', 'Hàng hóa'],
+    typeOrder: ['document', 'goods'],
     HEADER: {
         API_KEY: 'x-api-key',
         CLIENT_ID: 'x-client-id',
