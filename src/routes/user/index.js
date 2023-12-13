@@ -10,6 +10,7 @@ router.post(
   "/user",
   verifyMiddileware.verifyToken,
   // aclMiddleware,
+  upload.single('image'),
   userController.create
 );
 router.get("/user/:id", userController.getDetail);
