@@ -35,31 +35,38 @@ const oderSchema = new mongoose.Schema({
     current_department: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Department',
-        required: true,
     },
     next_department: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Department',
-        required: true
+    },
+    orderNotice: {
+        type: String,
+        default: ''
     },
     description: {
-        type: String,
-        required: true, 
+        type: Array,
+        default: [],
     }, 
     price: {
-        type: String,
+        type: Number,
         required: true,
+    }, 
+    COD: {
+        type: Number,
+        default: 0
     },
     status: {
         type: String,
         enum: UtilConstant.statusOrder,
     },
     weight: {
-        type: String,
-        default: '0 - 5kg', 
+        type: Number,
+        required: true,
     },
     expectedDate:{
         type: Date,
+        required: true, 
     },
 }, {
     timestamps: true,

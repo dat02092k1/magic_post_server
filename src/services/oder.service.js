@@ -14,13 +14,21 @@ class OrderService {
         const receiverDep = await Department.findById(order.receive_department).lean();
         if (!receiverDep) throw new Api404Error("receiver department not found");
 
+        if (order.send_department === order.receive_department) throw new Api403Error("sender and receiver department must be different");
+
+        if (order.current_department) {
         const currentDep = await Department.findById(order.current_department).lean();
         if (!currentDep) throw new Api404Error("current department not found");
+        }
 
+        if (order.next_department) {
         const nextDep = await Department.findById(order.next_department).lean();
         if (!nextDep) throw new Api404Error("next department not found");
+        }
 
         newOrder['status'] = 'processing';
+        newOrder['current_department'] = order.send_department;
+        newOrder['description'] = [{date: Date.now(), description: 'Đơn hàng đã được tạo'}];
         await newOrder.save(); 
 
         return {
@@ -93,8 +101,14 @@ class OrderService {
             const currentDep = await Department.findById(order.current_department).lean();
         if (!currentDep) throw new Api404Error("current department not found");
         }
+
+        if (order.description) {
+            holderOrder.description.push({date: Date.now(), description: order.description});
+            delete order.description; 
+        }
         
         UtilFunc.updateObj(holderOrder, order);
+         
         if (order.current_department.toString() === holderOrder.receive_department.toString()) {
             holderOrder.status = "delivered";
         }
