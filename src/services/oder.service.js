@@ -66,7 +66,7 @@ class OrderService {
 
     static async getOrdersByDepartmentId(departmentId) {
         return {
-            orders: await Order.find({current_department: departmentId}).lean(),
+            orders: await Order.find({send_department: departmentId}).lean(),
         }
     }
 
