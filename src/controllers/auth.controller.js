@@ -23,6 +23,10 @@ class AuthController {
       await AuthService.checkVerifyCode(req.body)
     );
   });
+
+  logout = asyncHandler(async (req, res, next) => {
+    OK(res, "logout success", await AuthService.logout());
+  });
 }
 
 module.exports = new AuthController();

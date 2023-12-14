@@ -4,7 +4,7 @@ const UserService = require("../services/user.service");
 
 class UserController {
   create = asyncHandler(async (req, res, next) => {
-    CREATED(res, "create success", await UserService.create(req.body));
+    CREATED(res, "create success", await UserService.create(req.body, req.file));
   });
 
   getDetail = asyncHandler(async (req, res, next) => {
@@ -25,6 +25,10 @@ class UserController {
 
   getByCondition = asyncHandler(async (req, res, next) => {
     OK(res, "get success", await UserService.getByCondition(req.query));
+  });
+
+  importUsers = asyncHandler(async (req, res, next) => {
+    OK(res, "import success", await UserService.importUsers(req));
   });
 }
 

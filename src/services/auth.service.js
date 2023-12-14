@@ -10,8 +10,8 @@ const UtilConstant = require("../utils/constants");
 class AuthService {
     static login = async (userData) => {
         const {email, password} = userData;
-        console.log(userData);
-        const user = await User.findOne({email: email}).lean();
+         
+        const user = await User.findOne({email: email}).populate('departmentId').lean();
 
         if (!user) throw new Api404Error('User not exists');
         console.log(password, user.password);
@@ -20,7 +20,7 @@ class AuthService {
         if (!match) throw new Api401Error('Wrong password');
 
         return {
-            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role', 'departmentId'], object: user }),
+            user: UtilFunc.getInfoData({ fields: ['_id', 'name', 'email', 'role', 'phone', 'gender', 'departmentId'], object: user }),
             token: UtilFunc.generateAccessToken(user)
         }
     }
@@ -71,6 +71,14 @@ class AuthService {
         return {
             user: UtilFunc.getInfoData({fields: ['_id', 'username', 'role'], object: user}),
         }
+    }
+
+    static logout = async () => {
+        res.clearCookie("refreshToken");
+
+        return {
+            'message': 'remove refresh token success',
+        } 
     }
 }
 
