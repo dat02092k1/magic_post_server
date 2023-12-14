@@ -66,7 +66,7 @@ const oderSchema = new mongoose.Schema({
     },
     expectedDate:{
         type: Date,
-        required: true, 
+        default: Date.now + 7*24*60*60*1000, 
     },
 }, {
     timestamps: true,

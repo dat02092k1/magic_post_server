@@ -1,7 +1,7 @@
 const Order = require("../models/order.model");
 const Department = require("../models/department.model");
 const UtilFunc = require("../utils/utils");
-const {Api404Error} = require("../rest_core/error.response");
+const {Api404Error, Api403Error} = require("../rest_core/error.response");
 
 class OrderService {    
     static async createOrder(order) {
@@ -92,20 +92,24 @@ class OrderService {
         const holderOrder = await Order.findById(id);
         if (!holderOrder) throw new Api404Error("order not found");
 
+        if (holderOrder.status === "delivered") throw new Api403Error("order has been delivered");
+
         if (order.next_department) {
             const nextDep = await Department.findById(order.next_department).lean();
-        if (!nextDep) throw new Api404Error("next department not found");
+            if (!nextDep) throw new Api404Error("next department not found");
         }
 
         if (order.current_department) {
             const currentDep = await Department.findById(order.current_department).lean();
-        if (!currentDep) throw new Api404Error("current department not found");
+            if (!currentDep) throw new Api404Error("current department not found");
         }
 
         if (order.description) {
             holderOrder.description.push({date: Date.now(), description: order.description});
             delete order.description; 
         }
+
+        if (!order.status) throw new Api403Error("status is required");
         
         UtilFunc.updateObj(holderOrder, order);
          
@@ -116,6 +120,42 @@ class OrderService {
 
         return {
             order: holderOrder,
+        }
+    }
+
+    static async updateOrdersStatus(orders, type) {  
+        switch (type) {
+            case "confirm":
+                orders.forEach(async (item) => {
+                    const holderOrder = await Order.findById(item._id);
+                    if (!holderOrder) throw new Api404Error("order not found");
+                    holderOrder.status = "accepted";
+                    holderOrder.current_department = item.next_department;
+                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    await holderOrder.save();
+                });
+                break;
+            case "assign":
+                orders.forEach(async (item) => {
+                    const holderOrder = await Order.findById(item._id);
+                    if (!holderOrder) throw new Api404Error("order not found");
+                    holderOrder.status = "processing";
+                    holderOrder.next_department = item.next_department;
+                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    await holderOrder.save();
+                });
+                break;
+            case "resend":
+                orders.forEach(async (item) => {
+                    const holderOrder = await Order.findById(item._id);
+                    if (!holderOrder) throw new Api404Error("order not found");
+                    holderOrder.status = "processing";
+                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    await holderOrder.save();
+                });
+                break;
+            default:
+                break;
         }
     }
 }

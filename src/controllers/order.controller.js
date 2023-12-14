@@ -43,6 +43,14 @@ class OrderController {
       await OrderService.updateOrderStatus(req.params.id, req.body)
     );
   });
+
+  updateOrdersStatus = asyncHandler(async (req, res, next) => {
+    OK(
+      res,
+      "update orders status",
+      await OrderService.updateOrdersStatus(req.body.orders, req.body.type)
+    );
+  });
 }
 
 module.exports = new OrderController();
