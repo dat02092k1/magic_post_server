@@ -123,37 +123,64 @@ class OrderService {
         }
     }
 
-    static async updateOrdersStatus(orders, type) {  
+    static async updateOrdersStatus(orders, type) {
+        if (!orders || orders.length === 0) throw new Api403Error("orders is required");
+
+        if (!type) throw new Api403Error("type is required");
+
         switch (type) {
             case "confirm":
                 orders.forEach(async (item) => {
                     const holderOrder = await Order.findById(item._id);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.current_department = item.current_department;
-                    (item.current_department === holderOrder.receive_department) ? holderOrder.status = 'delivered' : holderOrder.status = item.status;
+                    (item.current_department === holderOrder.receive_department) ? holderOrder.status = 'delivered' : holderOrder.status = "accepted";
+                    holderOrder.next_department = null;
                     holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
-            case "assign":
+
+            case "transfer":
                 orders.forEach(async (item) => {
                     const holderOrder = await Order.findById(item._id);
                     if (!holderOrder) throw new Api404Error("order not found");
-                    holderOrder.status = item.status;
+                    holderOrder.status = "processing";
                     holderOrder.next_department = item.next_department;
                     holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
+
             case "resend":
                 orders.forEach(async (item) => {
                     const holderOrder = await Order.findById(item._id);
                     if (!holderOrder) throw new Api404Error("order not found");
-                    holderOrder.status = item.status;
+                    holderOrder.status = "processing";
                     holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
+
+            case "reject":
+                orders.forEach(async (item) => {
+                    const holderOrder = await Order.findById(item._id);
+                    if (!holderOrder) throw new Api404Error("order not found");
+                    holderOrder.status = "rejected";
+                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    await holderOrder.save();
+                });
+                break;
+
+            case "cancel":
+                orders.forEach(async (item) => {
+                    const holderOrder = await Order.findById(item._id);
+                    if (!holderOrder) throw new Api404Error("order not found");
+                    holderOrder.status = "cancelled";
+                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    await holderOrder.save();
+                });
+
             default:
                 break;
         }
