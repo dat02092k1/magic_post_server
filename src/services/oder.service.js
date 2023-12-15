@@ -131,7 +131,7 @@ class OrderService {
         switch (type) {
             case "confirm":
                 orders.forEach(async (item) => {
-                    const holderOrder = await Order.findById(item._id);
+                    const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.current_department = item.current_department;
                     (item.current_department === holderOrder.receive_department) ? holderOrder.status = 'delivered' : holderOrder.status = "accepted";
@@ -143,7 +143,7 @@ class OrderService {
 
             case "transfer":
                 orders.forEach(async (item) => {
-                    const holderOrder = await Order.findById(item._id);
+                    const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "processing";
                     holderOrder.next_department = item.next_department;
@@ -154,7 +154,7 @@ class OrderService {
 
             case "resend":
                 orders.forEach(async (item) => {
-                    const holderOrder = await Order.findById(item._id);
+                    const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "processing";
                     holderOrder.description.push({date: Date.now(), description: item.description});
@@ -164,7 +164,7 @@ class OrderService {
 
             case "reject":
                 orders.forEach(async (item) => {
-                    const holderOrder = await Order.findById(item._id);
+                    const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "rejected";
                     holderOrder.description.push({date: Date.now(), description: item.description});
@@ -174,7 +174,7 @@ class OrderService {
 
             case "cancel":
                 orders.forEach(async (item) => {
-                    const holderOrder = await Order.findById(item._id);
+                    const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "cancelled";
                     holderOrder.description.push({date: Date.now(), description: item.description});
