@@ -136,7 +136,7 @@ class OrderService {
                     holderOrder.current_department = item.current_department;
                     (item.current_department === holderOrder.receive_department) ? holderOrder.status = 'delivered' : holderOrder.status = "accepted";
                     holderOrder.next_department = null;
-                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    if (item.description) holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
@@ -147,7 +147,7 @@ class OrderService {
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "processing";
                     holderOrder.next_department = item.next_department;
-                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    if (item.description) holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
@@ -157,7 +157,7 @@ class OrderService {
                     const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "processing";
-                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    if (item.description) holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
@@ -167,7 +167,7 @@ class OrderService {
                     const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "rejected";
-                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    if (item.description) holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
                 break;
@@ -177,7 +177,7 @@ class OrderService {
                     const holderOrder = await Order.findById(item.orderId);
                     if (!holderOrder) throw new Api404Error("order not found");
                     holderOrder.status = "cancelled";
-                    holderOrder.description.push({date: Date.now(), description: item.description});
+                    if (item.description) holderOrder.description.push({date: Date.now(), description: item.description});
                     await holderOrder.save();
                 });
 
