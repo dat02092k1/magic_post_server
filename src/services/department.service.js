@@ -107,13 +107,11 @@ class DepartmentService {
     if (!checkPoint) throw new Api404Error("this department not found");
 
     if (checkPoint.linkDepartments.length > 0) {
-      checkPoint.linkDepartments.forEach(
-        async (item) => {
-          const dep = await Department.findById(item.departmentId).lean();
-          item["name"] = dep.name;
-        }
-      );
-
+      for (const item of checkPoint.linkDepartments) {
+        const dep = await Department.findById(item.departmentId).lean();
+        item["name"] = dep.name;
+    }
+    
     }
 
     const hdUser = await User.findOne({
