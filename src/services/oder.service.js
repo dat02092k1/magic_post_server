@@ -73,7 +73,8 @@ class OrderService {
     static async getOrdersByCondition(condition) {
         return {
             numbers: await Order.countDocuments(condition).lean(), 
-            orders: await Order.find(condition).lean(),
+            // orders: await Order.find(condition).lean(),
+            orders: await Order.find(condition).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean(),
         }
     }
 

@@ -4,6 +4,7 @@ const { Api403Error, Api404Error } = require("../rest_core/error.response");
 const UtilFunc = require("../utils/utils");
 const bcrypt = require("bcrypt");
 const UtilConstant = require("../utils/constants");
+const { cloudinary } = require("../helpers/cloudinary");
 
 class DepartmentService {
   static get = async (query) => {
@@ -21,7 +22,7 @@ class DepartmentService {
     };
   };
 
-  static create = async (data) => {
+  static create = async (data, file) => {
     const { department, user } = data;
 
     const holderUser = await User.findOne({ email: user.email }).lean();
@@ -71,6 +72,24 @@ class DepartmentService {
       departmentId: newGatherPoint._id,
     });
 
+    if (file) {
+      if (!file.mimetype.startsWith('image/')) throw new Api403Error('Only image files are allowed');
+
+      cloudinary.uploader.upload(file.path, 
+        {
+          folder: 'File_img_CVHT_UET'
+        }, (error, result) => {
+        if (error) {
+          console.log('Error uploading image', error);
+          throw new Api404Error('Error uploading image');
+        } else {
+          console.log('Image uploaded successfully', result);
+          user.avatarUrl = result.secure_url;
+        }
+      }
+      ); 
+    }
+
     await newUser.save();
 
     return {
@@ -86,6 +105,16 @@ class DepartmentService {
     const checkPoint = await Department.findById(id).lean();
 
     if (!checkPoint) throw new Api404Error("this department not found");
+
+    if (checkPoint.linkDepartments.length > 0) {
+      checkPoint.linkDepartments.forEach(
+        async (item) => {
+          const dep = await Department.findById(item.departmentId).lean();
+          item["name"] = dep.name;
+        }
+      );
+
+    }
 
     const hdUser = await User.findOne({
       departmentId: id,

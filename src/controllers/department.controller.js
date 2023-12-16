@@ -4,7 +4,7 @@ const DepartmentService = require("../services/department.service");
 
 class DepartmentController {
   create = asyncHandler(async (req, res, next) => {
-    CREATED(res, "create success", await DepartmentService.create(req.body));
+    CREATED(res, "create success", await DepartmentService.create(req.body, req.file));
   });
 
   getDetail = asyncHandler(async (req, res, next) => {
