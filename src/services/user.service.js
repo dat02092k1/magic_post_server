@@ -16,30 +16,41 @@ class UserService {
 
     const user = new User(userDetails);
     user.password = hashPassword;
-    
-    if (file) {
-      if (!file.mimetype.startsWith('image/')) throw new Api403Error('Only image files are allowed');
 
-      cloudinary.uploader.upload(file.path, 
+    if (file) {
+      if (!file.mimetype.startsWith("image/"))
+        throw new Api403Error("Only image files are allowed");
+
+      cloudinary.uploader.upload(
+        file.path,
         {
-          folder: 'File_img_CVHT_UET'
-        }, (error, result) => {
-        if (error) {
-          console.log('Error uploading image', error);
-          throw new Api404Error('Error uploading image');
-        } else {
-          console.log('Image uploaded successfully', result);
-          user.avatarUrl = result.secure_url;
+          folder: "File_img_CVHT_UET",
+        },
+        (error, result) => {
+          if (error) {
+            console.log("Error uploading image", error);
+            throw new Api404Error("Error uploading image");
+          } else {
+            console.log("Image uploaded successfully", result);
+            user.avatarUrl = result.secure_url;
+          }
         }
-      }
-      ); 
+      );
     }
 
     await user.save();
 
     return {
       user: UtilFunc.getInfoData({
-        fields: ["_id", "name", "email", "role"],
+        fields: [
+          "_id",
+          "name",
+          "email",
+          "role",
+          "avatarUrl",
+          "phone",
+          "gender",
+        ],
         object: user,
       }),
       token: UtilFunc.generateAccessToken(user),
@@ -47,15 +58,12 @@ class UserService {
   };
 
   static getDetail = async (id) => {
-    const holderUser = await User.findById(id).populate("departmentId").lean();
+    const holderUser = await User.findById(id).populate("departmentId").select('-password').lean();
 
     if (!holderUser) throw new Api404Error("user not found");
 
     return {
-      user: UtilFunc.getInfoData({
-        fields: ['_id', 'name', 'email', 'role', 'phone', 'gender', 'departmentId'],
-        object: holderUser,
-      }),
+      user: holderUser,
     };
   };
 
@@ -80,22 +88,38 @@ class UserService {
 
   static getByCondition = async (query) => {
     query = UtilFunc.getQuery(query);
-
+    console.log(typeof (query.condition));
     var limit = parseInt(query.limit, 10);
     limit = isNaN(limit) ? 10 : limit;
     query.condition = JSON.parse(JSON.stringify(query.condition));
     const users = await User.find(JSON.parse(JSON.stringify(query.condition)))
+      .populate("departmentId")
       .limit(limit)
       .sort(query.sort);
 
     return {
-      users: users,
+      users: users.map((user) =>
+        UtilFunc.getInfoData({
+          fields: [
+            "_id",
+            "name",
+            "email",
+            "role",
+            "phone",
+            "gender",
+            "departmentId",
+          ],
+          object: user,
+        })
+      ),
+      numbers: await User.countDocuments(query.condition),
     };
   };
 
   static deleteUsersByCondition = async (condition) => {
     console.log(condition);
-    if (!condition || typeof condition !== 'object') throw new Api403Error("Invalid condition provided"); 
+    if (!condition || typeof condition !== "object")
+      throw new Api403Error("Invalid condition provided");
 
     const targetUsers = await User.deleteMany(condition);
 
@@ -104,7 +128,7 @@ class UserService {
     return {
       user: targetUsers,
     };
-  }
+  };
 }
 
 module.exports = UserService;
