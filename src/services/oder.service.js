@@ -4,6 +4,7 @@ const UtilFunc = require("../utils/utils");
 const {Api404Error, Api403Error} = require("../rest_core/error.response");
 const qr = require('qrcode');
 const PDFDocument = require('pdfkit');
+const { default: mongoose } = require("mongoose");
 
 class OrderService {    
     static async createOrder(order) {
@@ -46,6 +47,10 @@ class OrderService {
     }
 
     static async getOrderDetails(id) {
+        if (!mongoose.isValidObjectId(id)) {
+            throw new Api403Error('Invalid order ID');
+          }
+
         const order = await Order.findById(id).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
 
         if (!order) throw new Api404Error("order not found");
