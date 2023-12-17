@@ -2,6 +2,7 @@ const Order = require("../models/order.model");
 const Department = require("../models/department.model");
 const UtilFunc = require("../utils/utils");
 const {Api404Error, Api403Error} = require("../rest_core/error.response");
+const qr = require('qrcode');
 
 class OrderService {    
     static async createOrder(order) {
@@ -45,8 +46,10 @@ class OrderService {
 
     static async getOrderDetails(id) {
         const order = await Order.findById(id).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
-          
-        if (order.current_department.linkDepartments.length > 0)
+
+        if (!order) throw new Api404Error("order not found");
+
+        if (order.current_department?.linkDepartments.length > 0)
         {
             const departmentPromises = order.current_department.linkDepartments.map(async (item) => {
                 const dep = await Department.findById(item.departmentId).lean();
@@ -184,6 +187,18 @@ class OrderService {
 
             default:
                 break;
+        }
+    }
+
+    static async searchOrder(orderId) {
+        const holderOrder = await Order.findById(orderId).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
+        if (!holderOrder) throw new Api404Error("order not found");
+
+        const qrCode = await qr.toDataURL(JSON.stringify(holderOrder));
+
+        return {
+            order: holderOrder,
+            qrCode: qrCode,
         }
     }
 }

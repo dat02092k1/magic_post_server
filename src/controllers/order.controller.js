@@ -51,6 +51,14 @@ class OrderController {
       await OrderService.updateOrdersStatus(req.body.orders, req.body.type)
     );
   });
+
+  searchOrder = asyncHandler(async (req, res, next) => {
+    OK(
+      res,
+      "search order success",
+      await OrderService.searchOrder(req.body.orderId)
+    );
+  });
 }
 
 module.exports = new OrderController();
