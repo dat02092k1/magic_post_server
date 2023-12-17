@@ -18,6 +18,10 @@ const oderSchema = new mongoose.Schema({
         type: String,
         enum: UtilConstant.typeOrder,
     },
+    addess: {
+        type: String,
+        required: true,
+    },
     receiver: {
         type: String,
         required: true,

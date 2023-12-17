@@ -3,6 +3,7 @@ const Department = require("../models/department.model");
 const UtilFunc = require("../utils/utils");
 const {Api404Error, Api403Error} = require("../rest_core/error.response");
 const qr = require('qrcode');
+const PDFDocument = require('pdfkit');
 
 class OrderService {    
     static async createOrder(order) {
@@ -194,12 +195,56 @@ class OrderService {
         const holderOrder = await Order.findById(orderId).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
         if (!holderOrder) throw new Api404Error("order not found");
 
-        const qrCode = await qr.toDataURL(JSON.stringify(holderOrder));
+        const segs = [
+            { data: 'CUAMOTCANG', mode: 'alphanumeric' },
+            { data: '123', mode: 'numeric' }
+        ]
+        let rqCode = await qr.toDataURL(segs, {
+            color: {
+                dark: '#00F',
+                light: '#0000'
+            },
+            width: 300,
+            margin:10,
+            scale: 10
+        });
+        img = `<image src= " `+rqCode+ `" />`
+          const qrCode = await rqCode.toDataURL(JSON.stringify(userData), { errorCorrectionLevel: 'H' });
 
         return {
             order: holderOrder,
-            qrCode: qrCode,
+            qrCode: img
         }
+    }
+
+    static async createPdf(req, res) {
+        const orderDetails = await Order.findById(req.body.orderId).populate('send_department').populate('receive_department').populate('current_department').populate('next_department').lean();
+        if (!orderDetails) throw new Api404Error("order not found");
+
+        const doc = new PDFDocument();
+        let buffers = [];
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+            let pdfData = Buffer.concat(buffers);
+            res.writeHead(200, {
+                'Content-Length': Buffer.byteLength(pdfData),
+                'Content-Type': 'application/pdf',
+                'Content-disposition': `attachment;filename=order_${req.body.orderId}.pdf`,
+            }).end(pdfData);
+        });
+
+        // PDF Content
+        doc.fontSize(25).text('Order Details', {
+            underline: true
+        });
+        doc.fontSize(15).text(`Order ID: ${orderDetails._id}`);
+        doc.text(`Customer Name: ${orderDetails.sender}`);
+        doc.moveDown();
+            doc.text(`${orderDetails.weight}: $${orderDetails.price}`);
+        doc.text(`Total: $${orderDetails.expectedDate}`);
+        
+        doc.end();
+
     }
 }
 
