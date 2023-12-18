@@ -67,11 +67,32 @@ class UserService {
     };
   };
 
-  static edit = async (id, user) => {
+  static edit = async (id, user, file) => {
     let userData = await User.findById(id);
     if (!userData) throw new Api404Error("user not found");
 
     userData = UtilFunc.updateObj(userData, user);
+
+    if (file) {
+      if (!file.mimetype.startsWith("image/"))
+        throw new Api403Error("Only image files are allowed");
+
+      await cloudinary.uploader.upload(
+          file.path,
+          {
+            folder: "File_img_CVHT_UET",
+          },
+          (error, result) => {
+            if (error) {
+              console.log("Error uploading image", error);
+              throw new Api404Error("Error uploading image");
+            } else {
+              console.log("Image uploaded successfully", result);
+              userData.avatarUrl = result.secure_url;
+            }
+          }
+      );
+    }
 
     await userData.save();
   };

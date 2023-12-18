@@ -15,7 +15,7 @@ class UserController {
     OK(
       res,
       "edit detail success",
-      await UserService.edit(req.params.id, req.body)
+      await UserService.edit(req.params.id, req.body, req.file)
     );
   });
 
