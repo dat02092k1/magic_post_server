@@ -21,7 +21,7 @@ class UserService {
       if (!file.mimetype.startsWith("image/"))
         throw new Api403Error("Only image files are allowed");
 
-      cloudinary.uploader.upload(
+      await cloudinary.uploader.upload(
         file.path,
         {
           folder: "File_img_CVHT_UET",
