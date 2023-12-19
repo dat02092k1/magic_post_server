@@ -30,9 +30,7 @@ const validateFieldsMiddleware = (req, res, next) => {
         validationErrors.push(`Row ${data.indexOf(item) + 2}: ${error.message}`);
       }
     }
-  
-     
-  
+
     if (validationErrors.length > 0) {
       return res.status(400).json({
         message: "Validation errors",

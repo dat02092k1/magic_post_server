@@ -28,7 +28,7 @@ class UserController {
   });
 
   importUsers = asyncHandler(async (req, res, next) => {
-    OK(res, "import success", await UserService.importUsers(req));
+    OK(res, "import success", await UserService.importUsers(req.data));
   });
 }
 
