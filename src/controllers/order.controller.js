@@ -6,6 +6,7 @@ const Order = require("../models/order.model");
 const PDFDocument = require("pdfkit");
 const pdf = require("html-pdf");
 const {templateEngine} = require("../documents/templateHtml");
+const qr = require("qrcode");
 
 class OrderController {
   create = asyncHandler(async (req, res, next) => {
@@ -77,8 +78,23 @@ class OrderController {
       .lean();
     if (!orderDetails) throw new Api404Error("order not found");
 
+    const data = {
+      id: orderDetails._id,
+      name: orderDetails.name,
+      description: orderDetails.description,
+      send_department: orderDetails.send_department.name,
+      receive_department: orderDetails.receive_department.name,
+      current_department: orderDetails.current_department.name,
+      next_department: orderDetails.next_department.name,
+      status: orderDetails.status,
+      senderPhone: orderDetails.senderPhone,
+      receiverPhone: orderDetails.receiverPhone,
+    };
+    
+    const qrCode = await qr.toDataURL(JSON.stringify(data));
+
     pdf
-    .create(templateEngine(orderDetails), {})
+    .create(templateEngine(orderDetails, qrCode), {})
     .toBuffer((err, buffer) => {
       if (err) {
         res.status(500).send("Error generating PDF");

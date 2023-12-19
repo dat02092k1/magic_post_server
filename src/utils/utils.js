@@ -70,6 +70,13 @@ class UtilFunc {
     return `${day}/${month}/${year}`;
   }
 
+  static formatCurrency(value) {
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "VND",
+    }).format(value);
+  };
+
 }
 
 module.exports = UtilFunc;

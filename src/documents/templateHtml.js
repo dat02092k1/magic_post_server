@@ -1,6 +1,6 @@
 const UtilFunc = require("../utils/utils");
 
-const templateEngine = (order) => `
+const templateEngine = (order, qrCode) => `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -9,7 +9,6 @@ const templateEngine = (order) => `
     <title>Test receipt note</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-    <!-- Rest of your HTML code -->
     <style>
     * {
       margin: 0;
@@ -340,7 +339,7 @@ const templateEngine = (order) => `
         "
       >
         <h1>Magic Post</h1>
-        <img style="height: auto; max-width: 100%; width: 100%" alt="QR code" />
+        <img style="height: auto; max-width: 30%; width: 30%" alt="QR code" src=${qrCode} />
       </div>
       <div class="parcel-information">
         <div class="boxes">
@@ -526,7 +525,7 @@ const templateEngine = (order) => `
                   </p>
 
                   <div class="fare">
-                    <p>${order.price}</p>
+                    <p>${UtilFunc.formatCurrency(order.price)}</p>
                   </div>
                 </div>
                 <div class="recipient-fare">
@@ -535,7 +534,7 @@ const templateEngine = (order) => `
                   </p>
 
                   <div class="fare">
-                    <p>${order.COD}</p>
+                    <p>${UtilFunc.formatCurrency(order.price)}</p>
                   </div>
                 </div>
               </div>
