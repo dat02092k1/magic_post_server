@@ -76,7 +76,7 @@ class OrderController {
       .populate("next_department")
       .lean();
     if (!orderDetails) throw new Api404Error("order not found");
-     
+
     pdf
     .create(templateEngine(orderDetails), {})
     .toBuffer((err, buffer) => {
@@ -90,30 +90,6 @@ class OrderController {
       }
     });
 });
-    // const doc = new PDFDocument();
-    // let buffers = [];
-    // doc.on('data', buffers.push.bind(buffers));
-    // doc.on('end', () => {
-    //     let pdfData = Buffer.concat(buffers);
-    //     res.writeHead(200, {
-    //         'Content-Length': Buffer.byteLength(pdfData),
-    //         'Content-Type': 'application/pdf',
-    //         'Content-disposition': `attachment;filename=order_${req.body.orderId}.pdf`,
-    //     }).end(pdfData);
-    // });
-
-    // // PDF Content
-    // doc.fontSize(25).text('Order Details', {
-    //     underline: true
-    // });
-    // doc.fontSize(15).text(`Order ID: ${orderDetails._id}`);
-    // doc.text(`Customer Name: ${orderDetails.sender}`);
-    // doc.moveDown();
-    //     doc.text(`${orderDetails.weight}: $${orderDetails.price}`);
-    // doc.text(`Total: $${orderDetails.expectedDate}`);
-
-    // doc.end();
-
 }
 
 module.exports = new OrderController();
