@@ -37,10 +37,24 @@ const departmentSchema = new mongoose.Schema(
   }
 );
 
-departmentSchema.pre("remove", function (next) {
-  User.deleteMany({ departmentId: this._id })
-    .then(() => next())
-    .catch((err) => next(err));
+departmentSchema.pre("remove", async function (next) {
+  try {
+    // remove users related to department  update status order related to department
+    await User.deleteMany({ departmentId: this._id });
+
+    await Order.deleteMany({
+      $or: [
+        { send_department: this._id },
+        { receive_department: this._id },
+        { current_department: this._id, next_department: this._id }
+      ]
+    });
+
+    next(); // Call next only after both operations have completed
+  } catch (err) {
+    next(err); // Pass any error to the next middleware
+  }
 });
+
 
 module.exports = mongoose.model("Department", departmentSchema);

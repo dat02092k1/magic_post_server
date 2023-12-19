@@ -1,8 +1,7 @@
 const express = require("express");
-const app = express();
-
 const compression = require("compression");
 const cors = require("cors");
+const app = express();
 
 // init middleware
 app.use(compression());
@@ -30,5 +29,10 @@ const {logErrorMiddleware, returnError, is404Handler, isOperationalError} = requ
 app.use(is404Handler)
 app.use(logErrorMiddleware)
 app.use(returnError)
+
+// cron job
+const cronJobTaks = require("./helpers/cron-job");
+cronJobTaks.updateStatus();
+cronJobTaks.removeUser();
 
 module.exports = app;    
