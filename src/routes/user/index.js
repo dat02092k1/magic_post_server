@@ -14,7 +14,7 @@ router.post(
   userController.create
 );
 router.get("/user/:id", userController.getDetail);
-router.put("/user/:id", userController.editDetail);
+router.put("/user/:id", upload.single('image'), userController.editDetail);
 router.delete("/user/:id", userController.delete);
 router.get("/users", userController.getByCondition);
 router.post("/users/import", upload.single('file'), validateFieldsMiddleware, userController.importUsers);
