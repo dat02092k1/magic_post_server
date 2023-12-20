@@ -312,6 +312,7 @@ class OrderService {
       confirm: (holderOrder, item) => {
         holderOrder.current_department = item.current_department;
         holderOrder.next_department = null;
+        holderOrder.status = "accepted";
         if (item.description) {
           holderOrder.description.push({
             date: Date.now(),
