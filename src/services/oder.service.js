@@ -8,16 +8,22 @@ const { default: mongoose } = require("mongoose");
 
 class OrderService {
   static async createOrder(order) {
-    console.log(order);
     const newOrder = new Order(order);
 
     const senderDep = await Department.findById(order.send_department).lean();
     if (!senderDep) throw new Api404Error("sender department not found");
 
+    // check type of sender department
+    if (senderDep.type !== "Transaction") throw new Api403Error("senderDep department must be Transaction type");
+
     const receiverDep = await Department.findById(
       order.receive_department
     ).lean();
-    if (!receiverDep) throw new Api404Error("receiver department not found");
+
+    if (!receiverDep) throw new Api404Error("receiver department not found"); 
+
+    // check type of receiver department
+    if (receiverDep.type !== "Gathering") throw new Api403Error("receive department must be Gathering type");
 
     if (order.send_department === order.receive_department)
       throw new Api403Error("sender and receiver department must be different");
@@ -165,104 +171,211 @@ class OrderService {
     };
   }
 
+  // static async updateOrdersStatus(orders, type) {
+  //   if (!orders || orders.length === 0)
+  //     throw new Api403Error("orders is required");
+
+  //   if (!type) throw new Api403Error("type is required");
+
+  //   switch (type) {
+  //     case "confirm":
+  //       orders.forEach(async (item) => {
+  //         // check if orderId is sent from client
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+          
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.current_department = item.current_department;
+
+  //         holderOrder.next_department = null;
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+  //       break;
+
+  //     case "transfer":
+  //       orders.forEach(async (item) => {
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.status = "processing";
+  //         holderOrder.next_department = item.next_department;
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+  //       break;
+
+  //     case "resend":
+  //       orders.forEach(async (item) => {
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.status = "processing";
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+  //       break;
+
+  //     case "reject":
+  //       orders.forEach(async (item) => {
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.status = "rejected";
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+  //       break;
+
+  //     case "cancel":
+  //       orders.forEach(async (item) => {
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.status = "cancelled";
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+
+  //     case "delivered":
+  //       orders.forEach(async (item) => {
+  //         if (!item.orderId) throw new Api403Error("orderId is required");
+
+  //         const holderOrder = await Order.findById(item.orderId);
+  //         if (!holderOrder) throw new Api404Error("order not found");
+  //         holderOrder.status = "delivered";
+
+  //         if (item.description)
+  //           holderOrder.description.push({
+  //             date: Date.now(),
+  //             description: item.description,
+  //           });
+  //         await holderOrder.save();
+  //       });
+  //       break;
+
+  //     default:
+  //       break;
+  //   }
+  // }
+
   static async updateOrdersStatus(orders, type) {
-    if (!orders || orders.length === 0)
+    if (!orders || orders.length === 0) {
       throw new Api403Error("orders is required");
-
-    if (!type) throw new Api403Error("type is required");
-
-    switch (type) {
-      case "confirm":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.current_department = item.current_department;
-
-          holderOrder.next_department = null;
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-        break;
-
-      case "transfer":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.status = "processing";
-          holderOrder.next_department = item.next_department;
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-        break;
-
-      case "resend":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.status = "processing";
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-        break;
-
-      case "reject":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.status = "rejected";
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-        break;
-
-      case "cancel":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.status = "cancelled";
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-
-      case "delivered":
-        orders.forEach(async (item) => {
-          const holderOrder = await Order.findById(item.orderId);
-          if (!holderOrder) throw new Api404Error("order not found");
-          holderOrder.status = "delivered";
-
-          if (item.description)
-            holderOrder.description.push({
-              date: Date.now(),
-              description: item.description,
-            });
-          await holderOrder.save();
-        });
-        break;
-
-      default:
-        break;
+    }
+  
+    if (!type) {
+      throw new Api403Error("type is required");
+    }
+  
+    const processOrder = async (item, updateFunction) => {
+      if (!item.orderId) {
+        throw new Api403Error("orderId is required");
+      }
+  
+      const holderOrder = await Order.findById(item.orderId);
+  
+      if (!holderOrder) {
+        throw new Api404Error("order not found");
+      }
+  
+      updateFunction(holderOrder, item);
+  
+      await holderOrder.save();
+    };
+  
+    const updateFunctionMap = {
+      confirm: (holderOrder, item) => {
+        holderOrder.current_department = item.current_department;
+        holderOrder.next_department = null;
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+      transfer: (holderOrder, item) => {
+        holderOrder.status = "processing";
+        holderOrder.next_department = item.next_department;
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+      resend: (holderOrder, item) => {
+        holderOrder.status = "processing";
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+      reject: (holderOrder, item) => {
+        holderOrder.status = "rejected";
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+      cancel: (holderOrder, item) => {
+        holderOrder.status = "cancelled";
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+      delivered: (holderOrder, item) => {
+        holderOrder.status = "delivered";
+        if (item.description) {
+          holderOrder.description.push({
+            date: Date.now(),
+            description: item.description,
+          });
+        }
+      },
+    };
+  
+    const updateFunction = updateFunctionMap[type];
+  
+    if (updateFunction) {
+      await Promise.all(
+        orders.map((item) => processOrder(item, updateFunction))
+      );
     }
   }
+  
 
   static async searchOrder(orderId) {
     const holderOrder = await Order.findById(orderId)
