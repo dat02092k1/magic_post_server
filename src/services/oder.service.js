@@ -177,9 +177,7 @@ class OrderService {
           const holderOrder = await Order.findById(item.orderId);
           if (!holderOrder) throw new Api404Error("order not found");
           holderOrder.current_department = item.current_department;
-          item.current_department === holderOrder.receive_department
-            ? (holderOrder.status = "delivered")
-            : (holderOrder.status = "accepted");
+
           holderOrder.next_department = null;
           if (item.description)
             holderOrder.description.push({
@@ -245,6 +243,21 @@ class OrderService {
             });
           await holderOrder.save();
         });
+
+      case "delivered":
+        orders.forEach(async (item) => {
+          const holderOrder = await Order.findById(item.orderId);
+          if (!holderOrder) throw new Api404Error("order not found");
+          holderOrder.status = "delivered";
+
+          if (item.description)
+            holderOrder.description.push({
+              date: Date.now(),
+              description: item.description,
+            });
+          await holderOrder.save();
+        });
+        break;
 
       default:
         break;
