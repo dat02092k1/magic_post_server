@@ -23,7 +23,7 @@ class OrderService {
     if (!receiverDep) throw new Api404Error("receiver department not found"); 
 
     // check type of receiver department
-    if (receiverDep.type !== "Gathering") throw new Api403Error("receive department must be Gathering type");
+    if (receiverDep.type !== "Transaction") throw new Api403Error("receive department must be Transaction type");
 
     if (order.send_department === order.receive_department)
       throw new Api403Error("sender and receiver department must be different");
