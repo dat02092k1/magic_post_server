@@ -166,7 +166,7 @@ class UserService {
             User.find({email: {$in: Array.from(emailSet)}}, {email: 1}),
         ]);
 
-        const duplicateEmails = data.filter(item => existingUsers[1].some(user => user.email === item.email));
+        const duplicateEmails = data.filter(item => existingUsers[0].some(user => user.email === item.email));
 
         if (duplicateEmails.length > 0) {
             const errors = {
