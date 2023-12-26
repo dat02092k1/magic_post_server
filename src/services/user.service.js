@@ -109,8 +109,9 @@ class UserService {
     };
 
     static getByCondition = async (query) => {
-        query = UtilFunc.conditionQuery(query);
+        query = UtilFunc.getQuery(query);
 
+        query.condition = JSON.parse(JSON.stringify(query.condition));
         const users = await User.find(JSON.parse(JSON.stringify(query.condition)))
             .populate("departmentId")
             .sort(query.sort);
