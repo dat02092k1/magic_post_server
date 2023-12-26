@@ -34,6 +34,10 @@ class UtilFunc {
   }
 
   static conditionQuery = (query) => {
+    if (!query.sort) {
+      query.sort = "-created";
+    }
+
     if (!query.condition) {
       query.condition = {};
     } else {

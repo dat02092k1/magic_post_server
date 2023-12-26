@@ -109,14 +109,10 @@ class UserService {
     };
 
     static getByCondition = async (query) => {
-        query = UtilFunc.getQuery(query);
-        console.log(typeof (query.condition));
-        var limit = parseInt(query.limit, 10);
-        limit = isNaN(limit) ? 10 : limit;
-        query.condition = JSON.parse(JSON.stringify(query.condition));
+        query = UtilFunc.conditionQuery(query);
+
         const users = await User.find(JSON.parse(JSON.stringify(query.condition)))
             .populate("departmentId")
-            .limit(limit)
             .sort(query.sort);
 
         return {
