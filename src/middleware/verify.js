@@ -25,24 +25,18 @@ class verifyMiddileware {
 
     isAdmin = asyncHandler(async (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.role !== UtilConstant.roleUsers['admin']) throw new Api403Error('Only admin can do this');
-            next();
+            if (req.user.role !== UtilConstant.roleUsers['admin']) next();
+            else throw new Api403Error('Only admin can do this');
         })
     })
 
-    isHeadGathering = asyncHandler(async (req, res, next) => {
+    isHeadDepartment = asyncHandler(async (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.role !== UtilConstant.roleUsers['headGathering'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headGathering can do this');
-            next();
+            if (req.user.role !== UtilConstant.roleUsers['headGathering'] || user.role !== UtilConstant.roleUsers["headTransaction"] || req.user.role !== UtilConstant.roleUsers["admin"]) next();
+            else throw new Api403Error('Only admin & head department can do this');
         })
     })
 
-    isHeadTransaction = asyncHandler(async (req, res, next) => {
-        this.verifyToken(req, res, () => {
-            if (req.user.role !== UtilConstant.roleUsers['headTransaction'] || req.user.role !== utilContainers.roleUsers["admin"]) throw new Api403Error('Only headTransaction can do this');
-            next();
-        })
-    })
 }
 
 

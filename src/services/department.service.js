@@ -140,9 +140,8 @@ class DepartmentService {
     let checkPoint = await Department.findById(id);
 
     if (!checkPoint) throw new Api404Error("gather point not found");
-    console.log('quao');
-    console.log(checkPoint);
-    if (checkPoint.type && department.type !== checkPoint.type) {
+    
+    if (department.type && department.type !== checkPoint.type) {
       const departments = await Department.find({
         linkDepartments: {
           $elemMatch: {

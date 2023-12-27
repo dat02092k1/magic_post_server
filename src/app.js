@@ -13,6 +13,8 @@ app.use(
 );
 app.use(cors());
 
+// router.use(aclMiddleware);
+
 // init db
 require("./database/init.db");
 
