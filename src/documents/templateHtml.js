@@ -525,7 +525,7 @@ const templateEngine = (order, qrCode) => `
                   </p>
 
                   <div class="fare">
-                    <p>${UtilFunc.formatCurrency(order.price)}</p>
+                    <p>${UtilFunc.formatCurrency(order.COD)}</p>
                   </div>
                 </div>
                 <div class="recipient-fare">

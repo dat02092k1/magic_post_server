@@ -14,16 +14,18 @@ class OrderService {
     if (!senderDep) throw new Api404Error("sender department not found");
 
     // check type of sender department
-    if (senderDep.type !== "Transaction") throw new Api403Error("senderDep department must be Transaction type");
+    if (senderDep.type !== "Transaction")
+      throw new Api403Error("senderDep department must be Transaction type");
 
     const receiverDep = await Department.findById(
       order.receive_department
     ).lean();
 
-    if (!receiverDep) throw new Api404Error("receiver department not found"); 
+    if (!receiverDep) throw new Api404Error("receiver department not found");
 
     // check type of receiver department
-    if (receiverDep.type !== "Transaction") throw new Api403Error("receive department must be Transaction type");
+    if (receiverDep.type !== "Transaction")
+      throw new Api403Error("receive department must be Transaction type");
 
     if (order.send_department === order.receive_department)
       throw new Api403Error("sender and receiver department must be different");
@@ -182,7 +184,7 @@ class OrderService {
   //       orders.forEach(async (item) => {
   //         // check if orderId is sent from client
   //         if (!item.orderId) throw new Api403Error("orderId is required");
-          
+
   //         const holderOrder = await Order.findById(item.orderId);
   //         if (!holderOrder) throw new Api404Error("order not found");
   //         holderOrder.current_department = item.current_department;
@@ -287,27 +289,27 @@ class OrderService {
     if (!orders || orders.length === 0) {
       throw new Api403Error("orders is required");
     }
-  
+
     if (!type) {
       throw new Api403Error("type is required");
     }
-  
+
     const processOrder = async (item, updateFunction) => {
       if (!item.orderId) {
         throw new Api403Error("orderId is required");
       }
-  
+
       const holderOrder = await Order.findById(item.orderId);
-  
+
       if (!holderOrder) {
         throw new Api404Error("order not found");
       }
-  
+
       updateFunction(holderOrder, item);
-  
+
       await holderOrder.save();
     };
-  
+
     const updateFunctionMap = {
       confirm: (holderOrder, item) => {
         holderOrder.current_department = item.current_department;
@@ -367,16 +369,15 @@ class OrderService {
         }
       },
     };
-  
+
     const updateFunction = updateFunctionMap[type];
-  
+
     if (updateFunction) {
       await Promise.all(
         orders.map((item) => processOrder(item, updateFunction))
       );
     }
   }
-  
 
   static async searchOrder(orderId) {
     const holderOrder = await Order.findById(orderId)
@@ -392,9 +393,9 @@ class OrderService {
     const qrCode = await qr.toDataURL(holderOrderString);
 
     return {
-        order: holderOrder,
-        qrCode: qrCode,
-      };
+      order: holderOrder,
+      qrCode: qrCode,
+    };
   }
 
   static async createPdf(req, res) {
@@ -431,6 +432,18 @@ class OrderService {
     doc.text(`Total: $${orderDetails.expectedDate}`);
 
     doc.end();
+  }
+
+  static async deleteMany(condition) {
+    const deleteOrders = await Order.deleteMany(condition);
+
+    console.log(deleteOrders);
+    
+    if (!deleteOrders) throw new Api404Error("order not found");
+
+    return {
+      status: 1,
+    };
   }
 }
 

@@ -12,5 +12,6 @@ router.get("/orders/:id", orderController.getDetails);
 router.post("/orders-status", orderController.updateOrdersStatus);
 router.post("/orders-search", orderController.searchOrder);
 router.post("/orders-pdf", orderController.createPdf);
+router.post("/orders/delete", orderController.deleteMany);
 
 module.exports = router;

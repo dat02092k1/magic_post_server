@@ -5,7 +5,7 @@ const OrderService = require("../services/oder.service");
 const Order = require("../models/order.model");
 const PDFDocument = require("pdfkit");
 const pdf = require("html-pdf");
-const {templateEngine} = require("../documents/templateHtml");
+const { templateEngine } = require("../documents/templateHtml");
 const qr = require("qrcode");
 
 class OrderController {
@@ -82,30 +82,34 @@ class OrderController {
       id: orderDetails._id,
       name: orderDetails.name,
       description: orderDetails.description,
-      send_department: orderDetails.send_department.name,
-      receive_department: orderDetails.receive_department.name,
-      current_department: orderDetails.current_department.name,
-      next_department: orderDetails.next_department.name,
+      send_department: orderDetails.send_department?.name || "",
+      receive_department: orderDetails.receive_department?.name || "",
+      current_department: orderDetails.current_department?.name || "",
+      next_department: orderDetails.next_department?.name || "",
       status: orderDetails.status,
       senderPhone: orderDetails.senderPhone,
       receiverPhone: orderDetails.receiverPhone,
     };
-    
+
     const qrCode = await qr.toDataURL(JSON.stringify(data));
 
     pdf
-    .create(templateEngine(orderDetails, qrCode), {})
-    .toBuffer((err, buffer) => {
-      if (err) {
-        res.status(500).send("Error generating PDF");
-      } else {
-        // Send the generated PDF buffer as a response
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline; filename=result.pdf');
-        res.status(200).send(buffer);
-      }
-    });
-});
+      .create(templateEngine(orderDetails, qrCode), {})
+      .toBuffer((err, buffer) => {
+        if (err) {
+          res.status(500).send("Error generating PDF");
+        } else {
+          // Send the generated PDF buffer as a response
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader("Content-Disposition", "inline; filename=result.pdf");
+          res.status(200).send(buffer);
+        }
+      });
+  });
+
+  deleteMany = asyncHandler(async (req, res, next) => {
+    OK(res, "delete orders", await OrderService.deleteMany(req.body.condition));
+  });
 }
 
 module.exports = new OrderController();
