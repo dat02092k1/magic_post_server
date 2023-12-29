@@ -74,8 +74,6 @@ class AuthService {
     }
 
     static logout = async () => {
-        res.clearCookie("refreshToken");
-
         return {
             'message': 'remove refresh token success',
         } 
