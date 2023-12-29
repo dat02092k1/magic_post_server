@@ -1,3 +1,7 @@
+// to test server:
+
+https://magic-post-server-n25w.onrender.com
+
 // to run:
 
 1. npm install
