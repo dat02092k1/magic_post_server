@@ -6,6 +6,8 @@ require('../database/init.db');
 
 const ordersSeeding = async () => {
     const ordersSeeding = [];
+    const targetYear = 2020;
+
     for (let i = 0; i < utilContainers.numberSeeding; i++) {
         ordersSeeding.push({
             sender: faker.person.fullName(),
@@ -20,10 +22,11 @@ const ordersSeeding = async () => {
             description: [faker.lorem.sentence()],
             price: faker.datatype.number(),
             status: "processing",
-            weight: faker.datatype.number(), 
+            weight: faker.datatype.number(),
+            expectedDate: faker.date.between(new Date(`${targetYear}-01-01`), new Date(`${targetYear}-12-31`)),
             COD: faker.datatype.number(),
             orderNotice: faker.lorem.sentence(),
-            createdAt: faker.date.past(),
+            createdAt: faker.date.between(new Date(`${targetYear}-01-01`), new Date(`${targetYear}-12-31`)),
         })
     }
 

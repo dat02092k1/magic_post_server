@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { db: {host, password}} = require('../configs/config.db');
+const {host, password} = require('../configs/config.db');
 
 const connectString = `mongodb+srv://${host}:${password}@cluster0.9i4qvbm.mongodb.net/`;
 

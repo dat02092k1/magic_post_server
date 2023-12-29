@@ -24,4 +24,4 @@ const cloud = {
 
 const config = {dev, cloud}
 const env = process.env.NODE_ENV || 'cloud';
-module.exports = config[env];
+module.exports = config[env].db;
